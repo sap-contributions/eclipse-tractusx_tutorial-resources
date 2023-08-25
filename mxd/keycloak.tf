@@ -121,4 +121,5 @@ resource "kubernetes_service" "keycloak" {
 locals {
   keycloak-ip  = "10.96.103.80"
   keycloak-url = "${local.keycloak-ip}:${var.keycloak-port}"
+  keycloak-realm = "miw_test"
 }
