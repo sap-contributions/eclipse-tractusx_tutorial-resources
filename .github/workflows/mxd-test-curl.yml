@@ -1,0 +1,33 @@
+name: Run Curl Command
+
+on:
+  push:
+    branches:
+      - main # Change this to your main branch name
+
+jobs:
+  mxd-test-curl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Curl
+        run: |
+           apt-get update
+           apt-get install -y curl
+
+      - name: Run Curl Command
+        run: |
+          curl --fail http://localhost/bob/health/api/check/readiness
+          curl --fail http://localhost/alice/health/api/check/readiness 
+          curl --location --request POST 'http://localhost/bob/management/v2/contractdefinitions/request' \--header 'X-Api-Key: password' \--data ''
+          curl --location 'http://localhost/bob/management/v2/catalog/request' \ --header 'X-Api-Key: password' \ --header 'Content-Type: application/json' \ --data-raw '{ "@context": { "edc": "https://w3id.org/edc/v0.0.1/ns/" }, "@type": "CatalogRequest", "providerUrl": "", "counterPartyAddress":"http://10.96.202.82:8084/api/v1/dsp", "protocol": "dataspace-protocol-http", "querySpec": { "offset": 0, "limit": 50 } }'
+          curl --location 'http://localhost/alice/management/v2/catalog/request' \ --header 'X-Api-Key: password' \ --header 'Content-Type: application/json' \ --data-raw '{ "@context": { "edc": "https://w3id.org/edc/v0.0.1/ns/" }, "@type": "CatalogRequest", "providerUrl": "", "counterPartyAddress":"http://10.96.215.34:8084/api/v1/dsp", "protocol": "dataspace-protocol-http", "querySpec": { "offset": 0, "limit": 50 } }'
+          curl --location 'http://localhost/alice/management/v2/catalog/request' \ --header 'X-Api-Key: password' \ --header 'Content-Type: application/json' \ --data-raw '{ "@context": { "edc": "https://w3id.org/edc/v0.0.1/ns/" }, "@type": "CatalogRequest", "providerUrl": "", "counterPartyAddress":"http://10.96.215.34:8084/api/v1/dsp", "protocol": "dataspace-protocol-http", "querySpec": { "offset": 0, "limit": 50 } }'
+          curl --location --request POST 'http://localhost/bob/management/v2/assets/request' \ --header 'X-Api-Key: password'
+          curl --location 'http://localhost/bob/management/v2/assets' \ --header 'Content-Type: application/json' \ --header 'X-Api-Key: password' \ --data-raw '{ "@context": {}, "asset": { "@type": "Asset", "@id": "1", "properties": { "description": "Product EDC Demo Asset 1" } }, "dataAddress": { "@type": "DataAddress", "type": "HttpData", "baseUrl": "https://jsonplaceholder.typicode.com/todos" } }'
+          curl --location 'http://localhost/bob/management/v2/policydefinitions' \ --header 'Content-Type: application/json' \ --header 'X-Api-Key: password' \ --data-raw '{ "@context": { "odrl": "http://www.w3.org/ns/odrl/2/" }, "@type": "PolicyDefinitionRequestDto", "@id": "1", "policy": { "@type": "Policy", "odrl:permission" : [{ "odrl:action" : "USE", "odrl:constraint" : { "@type": "LogicalConstraint", "odrl:or" : [{ "@type" : "Constraint", "odrl:leftOperand" : "BusinessPartnerNumber", "odrl:operator" : { "@id": "odrl:eq" }, "odrl:rightOperand" : "BPNBOB" }] } }] } }'
+          
+   

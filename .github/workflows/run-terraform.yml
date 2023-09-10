@@ -66,6 +66,25 @@ jobs:
         working-directory: mxd
         run: |-
           terraform apply "$GITHUB_SHA.out"
+          
+          
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: mxd/postman
+          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14' # or your preferred Node.js version
+
+      - name: Install npm packages
+        run: npm install -g newman
+
+      - name: Run Newman
+        run: newman run mxd/postman/MXD_Management_v1.json
 
       - name: "Run tests"
         run: |-
