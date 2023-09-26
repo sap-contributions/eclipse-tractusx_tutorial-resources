@@ -67,6 +67,9 @@ jobs:
         run: |-
           terraform apply "$GITHUB_SHA.out"
 
+      - name: Checkout code
+        uses: actions/checkout@v2 # This step checks out your repository's code
+        
       - name: Run Tests
         uses: ./.github/workflows/mxd-test.yml # Invoking the test workflow
 
