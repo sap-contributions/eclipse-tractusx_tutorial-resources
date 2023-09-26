@@ -71,6 +71,8 @@ jobs:
         uses: actions/checkout@v2 # This step checks out your repository's code
         
       - name: Run Tests
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           cd ./.github/workflows
           gh workflow run mxd-test.yml
