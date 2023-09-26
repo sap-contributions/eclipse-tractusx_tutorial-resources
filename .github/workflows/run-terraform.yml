@@ -70,9 +70,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2 # This step checks out your repository's code
 
-        Run Tests:
-          uses: ./.github/workflows/mxd-test.yml
-
+      - name: Run Tests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd ./.github/workflows
+          gh workflow run mxd-test.yml
       - name: "Run tests"
         run: |-
           curl --fail http://localhost/bob/health/api/check/readiness
