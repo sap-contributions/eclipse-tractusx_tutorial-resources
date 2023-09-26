@@ -1,0 +1,29 @@
+name: Run Curl Command
+
+on:
+  push:
+    branches:
+      - main # Change this to your main branch name
+
+jobs:
+  mxd-test-curl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Curl
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl
+
+      - name: Run Curl Command
+        run: |
+          curl --fail http://localhost/bob/health/api/check/readiness
+          curl --fail http://localhost/alice/health/api/check/readiness 
+
+      - name: Run Tests
+        uses: actions/cache@v3
+        with:
+          workflow: Test

@@ -67,6 +67,9 @@ jobs:
         run: |-
           terraform apply "$GITHUB_SHA.out"
 
+      - name: Run Tests
+        uses: ./.github/workflows/mxd-test.yml # Invoking the test workflow
+
       - name: "Run tests"
         run: |-
           curl --fail http://localhost/bob/health/api/check/readiness
