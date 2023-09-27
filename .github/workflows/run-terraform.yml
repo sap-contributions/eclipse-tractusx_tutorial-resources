@@ -70,6 +70,14 @@ jobs:
         run: |-
           terraform apply "$GITHUB_SHA.out"
 
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Call Deploy to Staging workflow
+        uses: actions/workflow-dispatch@v2
+        with:
+          workflow: mxd-test.yml
+
       - name: "Run tests"
         run: |-
           curl --fail http://localhost/bob/health/api/check/readiness
