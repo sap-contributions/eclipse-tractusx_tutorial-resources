@@ -71,7 +71,7 @@ jobs:
         uses: actions/checkout@v2 # This step checks out your repository's code
 
       - name: Trigger Reusable Workflow
-        uses: ./.github/workflows/mxd-test.yml
+        uses: ./tree/improve-the-mxd-test-43-v1/.github/workflows/mxd-test.yml
 
       - name: "Run tests"
         run: |-
