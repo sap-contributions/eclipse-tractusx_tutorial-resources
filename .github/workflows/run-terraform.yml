@@ -67,10 +67,14 @@ jobs:
         working-directory: mxd
         run: |-
           terraform apply "$GITHUB_SHA.out"
-
+          
+      - name: Checkout code
+        uses: actions/checkout@v2
+  
       - name: Trigger Reusable Workflow
-        uses: ./tree/improve-the-mxd-test-43-v1/.github/workflows/mxd-test.yml
-        
+        uses: ./.github/workflows/mxd-test.yml
+  
+
       - name: "Run tests"
         run: |-
           curl --fail http://localhost/bob/health/api/check/readiness
