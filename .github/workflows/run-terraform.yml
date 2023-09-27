@@ -30,8 +30,6 @@ jobs:
   Deploy-with-Terraform:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Reusable Workflow
-        uses: ./tree/improve-the-mxd-test-43-v1/.github/workflows/mxd-demo.yml
 
       - name: "Setup Helm"
         uses: azure/setup-helm@v3.5
