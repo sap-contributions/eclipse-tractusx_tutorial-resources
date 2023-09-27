@@ -67,9 +67,6 @@ jobs:
         run: |-
           terraform apply "$GITHUB_SHA.out"
 
-      - name: Checkout code
-        uses: actions/checkout@v2 # This step checks out your repository's code
-
       - name: Trigger Reusable Workflow
         uses: ./tree/improve-the-mxd-test-43-v1/.github/workflows/mxd-test.yml
 
