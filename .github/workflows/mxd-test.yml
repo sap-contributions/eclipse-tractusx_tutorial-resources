@@ -20,24 +20,13 @@
 name: "Run Tests"
 on:
   workflow_call:
-    inputs:
-     image_name:
-       required: true
-       type: string
-     tag:
-       type: string
-    secrets:
-      registry_username:
-        required: true
-      registry_password:
-        required: true
 
 jobs:
   mxd-with-test:
 
     runs-on: ubuntu-latest
     steps:
-       - uses: actions/checkout@v3
+       - uses: actions/checkout@v4
        - uses: actions/cache@v3
          id: cache
          with:
