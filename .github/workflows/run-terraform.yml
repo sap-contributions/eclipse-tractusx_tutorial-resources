@@ -71,7 +71,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
   
-      - name: Trigger Reusable Workflow
+      - name: Trigger Reusable Workflow Test
         uses: ./.github/workflows/mxd-test.yml
   
 
