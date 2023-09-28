@@ -74,7 +74,7 @@ jobs:
           curl --fail http://localhost/alice/health/api/check/readiness
 
       - name: "Run Tests"
-          uses: ./.github/actions/mxd-test-action
+        uses: ./.github/actions/mxd-test-action
 
       - name: "Destroy the KinD cluster"
         run: >-
