@@ -69,8 +69,7 @@ jobs:
           terraform apply "$GITHUB_SHA.out"
   
       - name: "Trigger Reusable Workflow Test"
-        uses: ./.github/workflows/mxd-test.yml@improve-the-mxd-test-43-v1
-  
+        uses: ./.github/actions/mxd-test-action
 
       - name: "Run tests"
         run: |-

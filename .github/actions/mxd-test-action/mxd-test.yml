@@ -18,27 +18,18 @@
 #
 ---
 name: "Run Tests"
-on:
-  workflow_call:
+description: "Install newman and run test configured in postman collection."
 
-jobs:
-  mxd-with-test:
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14' # or your preferred Node.js version
 
-    runs-on: ubuntu-latest
-    steps:
-       - uses: actions/checkout@v4
-       - uses: actions/cache@v3
-         id: cache
-         with:
-            path: mxd/postman
-            key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-       - name: Setup Node.js
-         uses: actions/setup-node@v2
-         with:
-          node-version: '14' # or your preferred Node.js version
+    - name: Install newman
+      run: npm install -g newman
 
-       - name: Install npm packages
-         run: npm install -g newman
-
-       - name: Run Newman
-         run: newman run mxd/postman/MXD_Management_API.json
+    - name: Run Newman
+      run: newman run mxd/postman/MXD_Management_API.json
