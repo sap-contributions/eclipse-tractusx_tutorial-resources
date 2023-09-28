@@ -29,7 +29,9 @@ runs:
         node-version: '14' # or your preferred Node.js version
 
     - name: Install newman
+      shell: bash
       run: npm install -g newman
 
     - name: Run Newman
+      shell: bash
       run: newman run mxd/postman/MXD_Management_API.json
