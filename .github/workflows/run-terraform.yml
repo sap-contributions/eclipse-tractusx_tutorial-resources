@@ -67,18 +67,14 @@ jobs:
         working-directory: mxd
         run: |-
           terraform apply "$GITHUB_SHA.out"
-          
-      - name: Checkout code
-        uses: actions/checkout@v2
-  
-      - name: Trigger Reusable Workflow Test
-        uses: ./.github/workflows/mxd-test.yml
-  
 
-      - name: "Run tests"
+      - name: "Run Health Checks"
         run: |-
           curl --fail http://localhost/bob/health/api/check/readiness
           curl --fail http://localhost/alice/health/api/check/readiness
+
+      - name: "Run Tests"
+        uses: ./.github/actions/mxd-test-action
 
       - name: "Destroy the KinD cluster"
         run: >-
