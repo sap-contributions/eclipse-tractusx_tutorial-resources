@@ -1,0 +1,536 @@
+{
+	"info": {
+		"_postman_id": "d37a3d29-cd33-46e5-8815-57ea1d3a425f",
+		"name": "MXD Management API_S3_MINIO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17631269"
+	},
+	"item": [
+		{
+			"name": "SeedData",
+			"item": [
+				{
+					"name": "Create Asset 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204 No Content (if new asset) or 409 Conflict (if asset already exists)\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204, 409])",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"@context\": {},\n    \"asset\": {\n        \"@type\": \"Asset\",\n        \"@id\": \"3\",\n        \"properties\": {\n            \"description\": \"Product EDC Demo Asset 3- S3\"\n        }\n    },\n    \"properties\": {\n        \"version\": \"1.0\",\n        \"type\": \"AmazonS3\",\n        \"name\": \"document_alice\",\n        \"id\": \"document_alice\",\n        \"contenttype\": \"text/plain\"\n    },\n    \"dataAddress\": {\n        \"@type\": \"DataAddress\",\n        \"secretAccessKey\": \"qwerty123\",\n        \"accessKeyId\": \"qwerty123\",\n        \"endpointOverride\": \"http://10.96.103.86:9000\",\n        \"type\": \"AmazonS3\",\n        \"blobname\": \"document.txt\",\n        \"region\":\"us-east-1\",\n        \"bucketName\": \"alice-bucket\",\n        \"keyName\":\"document.txt\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ALICE_MANAGEMENT_URL}}/v2/assets",
+							"host": [
+								"{{ALICE_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v2",
+								"assets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Contract Definition 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204 No Content (if new contract definition) or 409 Conflict (if contract deifinition already exists)\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204, 409])",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"@context\": {},\n    \"@id\": \"3\",\n    \"@type\": \"ContractDefinition\",\n    \"accessPolicyId\": \"1\",\n    \"contractPolicyId\": \"1\",\n    \"assetsSelector\" : {\n        \"@type\" : \"CriterionDto\",\n        \"operandLeft\": \"{{EDC_NAMESPACE}}id\",\n        \"operator\": \"=\",\n        \"operandRight\": \"3\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ALICE_MANAGEMENT_URL}}/v2/contractdefinitions",
+							"host": [
+								"{{ALICE_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v2",
+								"contractdefinitions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Query Catalog",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"@context\": {\r\n        \"edc\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"providerUrl\": \"\",\r\n    \"counterPartyAddress\":\"{{ALICE_PROVIDER_PROTOCOL_DSP}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 50\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BOB_MANAGEMENT_URL}}/v2/catalog/request",
+							"host": [
+								"{{BOB_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v2",
+								"catalog",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Assets",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{ALICE_MANAGEMENT_URL}}/v3/assets/request",
+							"host": [
+								"{{ALICE_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v3",
+								"assets",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Policies",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"@context\": {\n        \"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n    },\n    \"id\": \"{{POLICY_ID}}\",\n    \"policy\": {\n        \"prohibitions\": [],\n        \"obligations\": [],\n        \"permissions\": [\n            {\n                \"edctype\": \"dataspaceconnector:permission\",\n                \"action\": {\n                    \"type\": \"USE\"\n                },\n                \"constraints\": []\n            }\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ALICE_MANAGEMENT_URL}}/v2/policydefinitions/request",
+							"host": [
+								"{{ALICE_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v2",
+								"policydefinitions",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Contract Definitiions",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ALICE_MANAGEMENT_URL}}/v2/contractdefinitions/request",
+							"host": [
+								"{{ALICE_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v2",
+								"contractdefinitions",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Initiate Negotation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Body matches string\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"NEGOTIATION_ID\", jsonData.id);",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"@context\": {\n\t\t\"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n\t},\n\t\"@type\": \"NegotiationInitiateRequestDto\",\n\t\"connectorAddress\": \"{{ALICE_PROVIDER_PROTOCOL_DSP}}\",\n\t\"protocol\": \"dataspace-protocol-http\",\n\t\"connectorId\": \"BPNL000000000001\",\n    \"callbackAddresses\": null,\n\t\"providerId\": \"BPNL000000000001\",\n\t\"offer\": {\n\t\t\"offerId\": \"Mw==:Mw==:ZDI0YjViYTktNzJiZS00M2YwLThmMGQtMjI2ODk5MDdiODg3\",\n\t\t\"assetId\": \"3\",\n\t\t\"policy\": {\n\t\t\t\"@type\": \"odrl:Set\",\n\t\t\t\"odrl:permission\": {\n\t\t\t\t\"odrl:target\": \"3\",\n\t\t\t\t\"odrl:action\": {\n\t\t\t\t\t\"odrl:type\": \"USE\"\n\t\t\t\t},\n\t\t\t\t\"odrl:constraint\": {\n\t\t\t\t\t\"odrl:or\": {\n\t\t\t\t\t\t\"odrl:leftOperand\": \"BusinessPartnerNumber\",\n\t\t\t\t\t\t\"odrl:operator\": {\n                            \"@id\": \"odrl:eq\"\n                        },\n\t\t\t\t\t\t\"odrl:rightOperand\": \"BPNL000000000002\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"odrl:prohibition\": [],\n\t\t\t\"odrl:obligation\": [],\n\t\t\t\"odrl:target\": \"3\"\n\t\t}\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BOB_MANAGEMENT_URL}}/v2/contractnegotiations",
+							"host": [
+								"{{BOB_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v2",
+								"contractnegotiations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Negotations",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BOB_MANAGEMENT_URL}}/v2/contractnegotiations/request",
+							"host": [
+								"{{BOB_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v2",
+								"contractnegotiations",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Initiate Transfer",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"TRANSFER_ID\", Math.random());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Body matches string\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"TRANSFER_PROCESS_ID\", jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"@context\": {\n       \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n    },\n    \"assetId\": \"3\",\n    \"connectorAddress\": \"{{ALICE_PROVIDER_PROTOCOL_DSP}}\",\n    \"connectorId\": \"BPNL000000000002\",\n    \"contractId\": \"568ef5e2-f43f-4cc8-8189-c6f544d27f35\",\n    \"dataDestination\": {\n        \"type\": \"AmazonS3\",\n        \"keyName\":\"document.txt\",\n        \"bucketName\": \"bob-bucket\",\n        \"region\":\"us-east-1\",\n        \"endpointOverride\":\"http://10.96.103.86:9000\",\n        \"accessKeyId\":\"qwerty123\",\n        \"secretAccessKey\":\"qwerty123\"\n    },\n    \"protocol\": \"dataspace-protocol-http\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BOB_MANAGEMENT_URL}}/v2/transferprocesses",
+							"host": [
+								"{{BOB_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v2",
+								"transferprocesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Transfers",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BOB_MANAGEMENT_URL}}/v2/transferprocesses/request",
+							"host": [
+								"{{BOB_MANAGEMENT_URL}}"
+							],
+							"path": [
+								"v2",
+								"transferprocesses",
+								"request"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "password",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "X-Api-Key",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ALICE_MANAGEMENT_URL",
+			"value": "http://localhost/alice/management"
+		},
+		{
+			"key": "ALICE_PROVIDER_PROTOCOL_URL",
+			"value": "http://alice-tractusx-connector-controlplane:8084/api/v1/dsp"
+		},
+		{
+			"key": "ALICE_PROVIDER_PROTOCOL_DSP",
+			"value": "http://alice-controlplane:8084/api/v1/dsp",
+			"type": "string"
+		},
+		{
+			"key": "BOB_MANAGEMENT_URL",
+			"value": "http://localhost/bob/management",
+			"type": "string"
+		},
+		{
+			"key": "BOB_PROVIDER_PROTOCOL_URL",
+			"value": "http://bob-tractusx-connector-controlplane:8084/api/v1/dsp",
+			"type": "string"
+		},
+		{
+			"key": "BOB_PROVIDER_PROTOCOL_DSP",
+			"value": "http://bob-controlplane:8084/api/v1/dsp",
+			"type": "string"
+		},
+		{
+			"key": "ASSET_ID",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "POLICY_ID",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "CONTRACT_POLICY_ID",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "ACCESS_POLICY_ID",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "CONTRACT_DEFINITION_ID",
+			"value": "1",
+			"type": "default"
+		},
+		{
+			"key": "POLICY_BPN",
+			"value": "BPNBOB",
+			"type": "default"
+		},
+		{
+			"key": "NEGOTIATION_ID",
+			"value": "1"
+		},
+		{
+			"key": "AGREEMENT_ID",
+			"value": "1"
+		},
+		{
+			"key": "TRANSFER_ID",
+			"value": "1"
+		},
+		{
+			"key": "TRANSFER_PROCESS_ID",
+			"value": "1"
+		},
+		{
+			"key": "BACKEND_SERVICE",
+			"value": "http://backend:8080",
+			"type": "string"
+		},
+		{
+			"key": "AGREEMENT-ID",
+			"value": "1"
+		},
+		{
+			"key": "authCode",
+			"value": "1"
+		},
+		{
+			"key": "PROVIDER_ID",
+			"value": "BPNPLATO",
+			"type": "string"
+		},
+		{
+			"key": "EDC_NAMESPACE",
+			"value": "https://w3id.org/edc/v0.0.1/ns/",
+			"type": "string"
+		},
+		{
+			"key": "CONSUMER_ADAPTER_URL",
+			"value": "http://localhost:31364/management",
+			"type": "string"
+		}
+	]
+}
