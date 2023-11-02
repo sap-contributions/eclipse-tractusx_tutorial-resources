@@ -52,7 +52,7 @@ resource "kubernetes_service" "minio-service" {
   spec {
     cluster_ip = "10.96.103.86"
     port {
-      protocol   = "TCP"
+      protocol    = "TCP"
       name        = "minio-api"
       port        = 9000
       target_port = 9000
@@ -99,7 +99,7 @@ resource "kubernetes_deployment" "minio" {
         container {
           image = "minio/minio:RELEASE.2022-03-17T06-34-49Z"
           name  = "minio"
-          args = ["server", "/storage", "--console-address=:9001"]
+          args  = ["server", "/storage", "--console-address=:9001"]
           env {
             name  = "MINIO_ROOT_USER"
             value = local.minio-username
@@ -190,7 +190,7 @@ resource "kubernetes_job" "put-text-document" {
   depends_on = [kubernetes_deployment.minio,
     kubernetes_service.minio-service,
     kubernetes_job.create_minio_bucket,
-    kubernetes_config_map.minio-seed-collection]
+  kubernetes_config_map.minio-seed-collection]
 
   metadata {
     name      = "put-text-document"
@@ -207,8 +207,8 @@ resource "kubernetes_job" "put-text-document" {
       }
       spec {
         container {
-          name  = "mc"
-          image = "minio/mc"
+          name    = "mc"
+          image   = "minio/mc"
           command = ["/bin/sh", "-c"]
           args    = ["mc config host add minio http://${local.minio-url} ${local.minio-username} ${local.minio-password} && mc cp /opt/config/${local.minio-seed_collection_name} minio/alice-bucket/document.txt"]
           volume_mount {
@@ -217,7 +217,7 @@ resource "kubernetes_job" "put-text-document" {
           }
           env {
             name  = "MC_HOSTS"
-            value = local.minio-url  # MinIO service hostname and port
+            value = local.minio-url # MinIO service hostname and port
           }
           env {
             name  = "MINIO_ROOT_USER"
@@ -242,7 +242,7 @@ resource "kubernetes_job" "put-text-document" {
 
 resource "kubernetes_config_map" "minio-seed-collection" {
   metadata {
-    name = "minio-seed-collection"
+    name      = "minio-seed-collection"
     namespace = kubernetes_namespace.minio.metadata[0].name
   }
   data = {
@@ -252,10 +252,10 @@ resource "kubernetes_config_map" "minio-seed-collection" {
 
 locals {
   minio-seed_collection_name = "testdocument.txt"
-  minio-ip         =  "10.96.103.86"
-  minio-port       =  "9000"
-  minio-username   =  "qwerty123"
-  minio-password   =  "qwerty123"
-  minio-url        =  "${local.minio-ip}:${local.minio-port}"
-  minio-realm      =  "minio"
+  minio-ip                   = "10.96.103.86"
+  minio-port                 = "9000"
+  minio-username             = "qwerty123"
+  minio-password             = "qwerty123"
+  minio-url                  = "${local.minio-ip}:${local.minio-port}"
+  minio-realm                = "minio"
 }
