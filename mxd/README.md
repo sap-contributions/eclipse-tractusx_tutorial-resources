@@ -1010,7 +1010,6 @@ curl --location 'http://localhost/alice/management/v2/assets' \
         "@type": "DataAddress",
         "secretAccessKey": "qwerty123",
         "accessKeyId": "qwerty123",
-        "endpointOverride": "http://10.96.103.86:9000",
         "type": "AmazonS3",
         "blobname": "document.txt",
         "region":"us-east-1",
@@ -1064,7 +1063,7 @@ curl --location 'http://localhost/alice/management/v2/contractdefinitions' \
 --header 'X-Api-Key: password' \
 --data-raw '{
     "@context": {},
-    "@id": "2",
+    "@id": "3",
     "@type": "ContractDefinition",
     "accessPolicyId": "2",
     "contractPolicyId": "2",
@@ -1092,7 +1091,7 @@ curl --location 'http://localhost/bob/management/v2/contractnegotiations' \
 	"connectorAddress": "http://alice-controlplane:8084/api/v1/dsp",
 	"protocol": "dataspace-protocol-http",
 	"connectorId": "BPNL000000000001",
-    "callbackAddresses": null,
+	"callbackAddresses": null,
 	"providerId": "BPNL000000000001",
 	"offer": {
 		"offerId": "Mw==:Mw==:Y2JmOWY4MTMtYjU2ZC00NThhLTg1NTQtMTY1NGMyOGQ3ZGQ3",

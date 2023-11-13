@@ -154,38 +154,14 @@ resource "kubernetes_job" "create_minio_bucket" {
           name    = "minio-client"
           image   = "minio/mc:latest" # Use the appropriate MinIO client image
           command = ["/bin/sh", "-c"]
-          args    = ["mc config host add minio http://${local.minio-url} ${local.minio-username} ${local.minio-password} && mc mb minio/alice-bucket"]
+          args    = ["mc config host add minio http://${local.minio-url} ${local.minio-username} ${local.minio-password} && mc mb minio/alice-bucket && mc mb minio/bob-bucket"]
         }
       }
     }
   }
 }
 
-resource "kubernetes_job" "create_bob_minio_bucket" {
-  depends_on = [kubernetes_deployment.minio, kubernetes_service.minio-service]
-  metadata {
-    name      = "create-bob-minio-bucket"
-    namespace = kubernetes_namespace.minio.metadata[0].name
-  }
-  spec {
-    ttl_seconds_after_finished = "90"
-    completions                = 1
-    completion_mode            = "NonIndexed"
-    template {
-      metadata {
-        name = "create-bob-minio-bucket"
-      }
-      spec {
-        container {
-          name    = "minio-client"
-          image   = "minio/mc:latest" # Use the appropriate MinIO client image
-          command = ["/bin/sh", "-c"]
-          args    = ["mc config host add minio http://${local.minio-url} ${local.minio-username} ${local.minio-password} && mc mb minio/bob-bucket"]
-        }
-      }
-    }
-  }
-}
+
 resource "kubernetes_job" "put-text-document" {
   depends_on = [kubernetes_deployment.minio,
     kubernetes_service.minio-service,
