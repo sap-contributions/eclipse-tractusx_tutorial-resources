@@ -49,6 +49,7 @@ provider "helm" {
 
 # First connector
 module "alice-connector" {
+  depends_on = [module.alice-minio]
   source            = "./modules/connector"
   humanReadableName = "alice"
   participantId     = var.alice-bpn
@@ -70,6 +71,7 @@ module "alice-connector" {
 
 # Second connector
 module "bob-connector" {
+  depends_on = [module.bob-minio]
   source            = "./modules/connector"
   humanReadableName = "bob"
   participantId     = var.bob-bpn
@@ -87,4 +89,17 @@ module "bob-connector" {
     oauth-secretalias  = "client_secret_alias"
     oauth-clientsecret = "bob_private_client"
   }
+}
+
+module "alice-minio"{
+  source = "./modules/minio"
+  humanReadableName = "alice"
+  bucket-name = "alice-bucket"
+  pre-populate-asset = true
+}
+
+module "bob-minio"{
+  source = "./modules/minio"
+  humanReadableName = "bob"
+  bucket-name = "bob-bucket"
 }

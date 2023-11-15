@@ -77,3 +77,11 @@ output "bob-node-ip" {
 output "alice-node-ip" {
   value = module.alice-connector.node-ip
 }
+
+output "alice-minio-url" {
+  value = module.alice-minio.url
+}
+
+output "bob-minio-url" {
+  value = module.bob-minio.url
+}
