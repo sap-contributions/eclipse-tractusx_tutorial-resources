@@ -1,6 +1,25 @@
+#
+#  Copyright (c) 2023 Contributors to the Eclipse Foundation
+#
+#  See the NOTICE file(s) distributed with this work for additional
+#  information regarding copyright ownership.
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+
 resource "kubernetes_persistent_volume_claim" "minio-pv-claim" {
   metadata {
-    name      = "${var.humanReadableName}-minio-pv-claim"
+    name = "${var.humanReadableName}-minio-pv-claim"
     labels = {
       app = "${var.humanReadableName}-minio-storage-claim"
     }
@@ -18,7 +37,7 @@ resource "kubernetes_persistent_volume_claim" "minio-pv-claim" {
 
 resource "kubernetes_deployment" "minio" {
   metadata {
-    name      = "${var.humanReadableName}-minio"
+    name = "${var.humanReadableName}-minio"
     labels = {
       app = "${var.humanReadableName}-minio"
     }
@@ -57,11 +76,11 @@ resource "kubernetes_deployment" "minio" {
           }
           port {
             container_port = var.minio-api-port
-           // host_port      = var.minio-api-port
+            // host_port      = var.minio-api-port
           }
           port {
             container_port = var.minio-console-port
-          //  host_port      = var.minio-console-port
+            //  host_port      = var.minio-console-port
           }
           volume_mount {
             name       = "storage"
@@ -91,5 +110,5 @@ locals {
   minio-url                  = "${local.minio-ip}:${local.minio-port}"
   minio-password             = "qwerty123"
   minio-username             = "qwerty123"
-  bucket-name                =  var.bucket-name
+  bucket-name                = var.bucket-name
 }

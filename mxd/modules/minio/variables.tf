@@ -37,6 +37,6 @@ variable "bucket-name" {
 }
 
 variable "pre-populate-asset" {
-  type        = bool
+  type    = bool
   default = false
 }
