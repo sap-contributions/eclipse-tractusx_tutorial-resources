@@ -110,5 +110,5 @@ locals {
   minio-url                  = "${local.minio-ip}:${local.minio-port}"
   minio-password             = "qwerty123"
   minio-username             = "qwerty123"
-  bucket-name                = var.bucket-name
+  bucket-name                = "${var.humanReadableName}-bucket"
 }

@@ -31,11 +31,6 @@ variable "minio-console-port" {
   default = 9001
 }
 
-variable "bucket-name" {
-  type        = string
-  description = "Bucket Name"
-}
-
 variable "pre-populate-asset" {
   type    = bool
   default = false

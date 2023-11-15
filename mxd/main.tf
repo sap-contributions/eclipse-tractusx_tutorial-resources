@@ -94,12 +94,10 @@ module "bob-connector" {
 module "alice-minio" {
   source             = "./modules/minio"
   humanReadableName  = "alice"
-  bucket-name        = "alice-bucket"
   pre-populate-asset = true
 }
 
 module "bob-minio" {
   source            = "./modules/minio"
   humanReadableName = "bob"
-  bucket-name       = "bob-bucket"
 }
