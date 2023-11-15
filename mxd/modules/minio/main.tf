@@ -108,7 +108,7 @@ locals {
   minio-ip                   = kubernetes_service.minio-service.spec.0.cluster_ip
   minio-port                 = kubernetes_service.minio-service.spec.0.port.0.port
   minio-url                  = "${local.minio-ip}:${local.minio-port}"
-  minio-password             = "qwerty123"
-  minio-username             = "qwerty123"
+  minio-password             = "${var.minio-password}"
+  minio-username             = "${var.minio-username}"
   bucket-name                = "${var.humanReadableName}-bucket"
 }
