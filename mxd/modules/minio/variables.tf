@@ -36,12 +36,12 @@ variable "pre-populate-asset" {
   default = false
 }
 
-variable "minio-username"{
+variable "minio-username" {
   type        = string
   description = "minio-username"
 }
 
-variable "minio-password"{
+variable "minio-password" {
   type        = string
   description = "minio-password"
 }

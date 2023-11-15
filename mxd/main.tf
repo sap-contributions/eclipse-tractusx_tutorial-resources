@@ -95,13 +95,13 @@ module "alice-minio" {
   source             = "./modules/minio"
   humanReadableName  = "alice"
   pre-populate-asset = true
-  minio-username = "qwerty123"
-  minio-password = "qwerty123"
+  minio-username     = "qwerty123"
+  minio-password     = "qwerty123"
 }
 
 module "bob-minio" {
   source            = "./modules/minio"
   humanReadableName = "bob"
-  minio-username = "qwerty123"
-  minio-password = "qwerty123"
+  minio-username    = "qwerty123"
+  minio-password    = "qwerty123"
 }
