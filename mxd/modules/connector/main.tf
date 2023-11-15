@@ -62,6 +62,13 @@ resource "helm_release" "connector" {
           }
         }
       }
+      dataplane : {
+        aws : {
+          endpointOverride : "http://${var.minio-config.minio-url}"
+          accessKeyId : var.minio-config.minio-username
+          secretAccessKey : var.minio-config.minio-password
+        }
+      }
     })
   ]
   set {

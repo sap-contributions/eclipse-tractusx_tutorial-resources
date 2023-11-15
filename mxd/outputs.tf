@@ -79,9 +79,9 @@ output "alice-node-ip" {
 }
 
 output "alice-minio-url" {
-  value = module.alice-minio.url
+  value = module.alice-minio.minio-url
 }
 
 output "bob-minio-url" {
-  value = module.bob-minio.url
+  value = module.bob-minio.minio-url
 }

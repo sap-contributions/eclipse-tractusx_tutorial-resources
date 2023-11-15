@@ -17,8 +17,14 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-output "url" {
-  value = {
-    minio-url = local.minio-url
-  }
+output "minio-url" {
+  value = local.minio-url
+}
+
+output "minio-username" {
+  value = local.minio-username
+}
+
+output "minio-password" {
+  value = local.minio-password
 }

@@ -1008,8 +1008,6 @@ curl --location 'http://localhost/alice/management/v2/assets' \
     },
     "dataAddress": {
         "@type": "DataAddress",
-        "secretAccessKey": "qwerty123",
-        "accessKeyId": "qwerty123",
         "type": "AmazonS3",
         "blobname": "document.txt",
         "region":"us-east-1",
