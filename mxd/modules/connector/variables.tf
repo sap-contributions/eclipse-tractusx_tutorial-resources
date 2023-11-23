@@ -69,5 +69,6 @@ variable "minio-config" {
     minio-url      = ""
     minio-username = ""
     minio-password = ""
+    minio-secret-alias = ""
   }
 }

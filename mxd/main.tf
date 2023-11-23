@@ -71,6 +71,7 @@ module "alice-connector" {
     minio-url      = module.alice-minio.minio-url
     minio-username = module.alice-minio.minio-username
     minio-password = module.alice-minio.minio-password
+    minio-secret-alias ="minio-secret-alice"
   }
 }
 
@@ -98,6 +99,7 @@ module "bob-connector" {
     minio-url      = module.bob-minio.minio-url
     minio-username = module.bob-minio.minio-username
     minio-password = module.bob-minio.minio-password
+    minio-secret-alias ="minio-secret-bob"
   }
 }
 
