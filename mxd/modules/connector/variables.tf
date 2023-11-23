@@ -66,9 +66,9 @@ variable "ssi-config" {
 
 variable "minio-config" {
   default = {
-    minio-url      = ""
-    minio-username = ""
-    minio-password = ""
+    minio-url          = ""
+    minio-username     = ""
+    minio-password     = ""
     minio-secret-alias = ""
   }
 }

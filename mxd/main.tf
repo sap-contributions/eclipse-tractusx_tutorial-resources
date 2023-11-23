@@ -68,10 +68,10 @@ module "alice-connector" {
     oauth-clientsecret = "alice_private_client"
   }
   minio-config = {
-    minio-url      = module.alice-minio.minio-url
-    minio-username = module.alice-minio.minio-username
-    minio-password = module.alice-minio.minio-password
-    minio-secret-alias ="minio-secret-alice"
+    minio-url          = module.alice-minio.minio-url
+    minio-username     = module.alice-minio.minio-username
+    minio-password     = module.alice-minio.minio-password
+    minio-secret-alias = "minio-secret-alice"
   }
 }
 
@@ -96,10 +96,10 @@ module "bob-connector" {
     oauth-clientsecret = "bob_private_client"
   }
   minio-config = {
-    minio-url      = module.bob-minio.minio-url
-    minio-username = module.bob-minio.minio-username
-    minio-password = module.bob-minio.minio-password
-    minio-secret-alias ="minio-secret-bob"
+    minio-url          = module.bob-minio.minio-url
+    minio-username     = module.bob-minio.minio-username
+    minio-password     = module.bob-minio.minio-password
+    minio-secret-alias = "minio-secret-bob"
   }
 }
 
