@@ -72,9 +72,9 @@ module "alice-connector" {
     minio-username                 = module.alice-minio.minio-username
     minio-password                 = module.alice-minio.minio-password
     minio-secret-alias             = "minio-secret-alice"
-    minio-temp-access-key          = "894D5IM0L3D76CLZA1KE"
-    minio-temp-secret-access-key   = "ETlOcuWRxd9pSheCu1+kKfyjmXJDGMVywUpDioQl"
-    minio-temp-secret-access-token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiI4OTRENUlNMEwzRDc2Q0xaQTFLRSIsImV4cCI6MTcyMDAwMjk1NCwicGFyZW50IjoicXdlcnR5MTIzIn0.4_1AOBsx2QOYto-OJ7alv_o8Tbs5C5ExuB5O4k725vK_p9y34Es7VKkqJuhk4YZppZ3JCLPKIZbqgWM8GLx0hA"
+    minio-temp-access-key          = ""
+    minio-temp-secret-access-key   = ""
+    minio-temp-secret-access-token = ""
   }
 }
 
@@ -103,9 +103,9 @@ module "bob-connector" {
     minio-username                 = module.bob-minio.minio-username
     minio-password                 = module.bob-minio.minio-password
     minio-secret-alias             = "minio-secret-bob"
-    minio-temp-access-key          = "DJMMRMKO9IALWS853XB9"
-    minio-temp-secret-access-key   = "bqGB0oOkb44O0CNhF4w1KDcagFbfrLAskcydHAWa"
-    minio-temp-secret-access-token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiJESk1NUk1LTzlJQUxXUzg1M1hCOSIsImV4cCI6MTcyMDAwMzMwMCwicGFyZW50IjoicXdlcnR5MTIzIn0.VneysXnWIxvPImufOvsDZrzVwueAgYyAatQ0Sh-417k6_BUoJDaBnH_Bu1oXusdfqFWlIWQVLApIUB3-U9EpKw"
+    minio-temp-access-key          = ""
+    minio-temp-secret-access-key   = ""
+    minio-temp-secret-access-token = ""
   }
 
 }
