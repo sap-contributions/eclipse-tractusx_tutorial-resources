@@ -120,6 +120,6 @@ locals {
   aes_key_b64   = base64encode(random_string.aes_key_raw.result)
   client_secret = base64encode(random_string.kc_client_secret.result)
   jdbcUrl       = "jdbc:postgresql://${var.database-host}:${var.database-port}/${var.database-name}"
-  minio-secret  = jsonencode({ accessKeyId = "${var.minio-config.minio-username}", secretAccessKey = "${var.minio-config.minio-password}", edctype = "dataspaceconnector:secrettoken", sessionToken = null })
+  minio-secret  = jsonencode({ accessKeyId = "${var.minio-config.minio-temp-access-key}", secretAccessKey = "${var.minio-config.minio-temp-secret-access-key}", edctype = "dataspaceconnector:secrettoken", sessionToken = "${var.minio-config.minio-temp-secret-access-token}" })
 }
 //-format=json data='{'accessKeyId':'qwerty123','secretAccessKey' : 'qwerty123'}'
