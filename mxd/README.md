@@ -31,6 +31,8 @@ once and are accessible by all participants.
 For the most bare-bones installation of the dataspace, execute the following commands in a shell:
 
 ```shell
+# firstly go to the folder containing the config files
+cd <path/of/mxd>
 kind create cluster -n mxd --config kind.config.yaml
 # the next step is specific to KinD and will be different for other Kubernetes runtimes!
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
@@ -39,7 +41,6 @@ kubectl wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
   --timeout=90s
-cd <path/of/mxd>
 terraform init
 terraform apply
 # type "yes" and press enter when prompted to do so 
@@ -739,23 +740,20 @@ Let's insert some data into `Trudy` connector.
 #### 7.6.1 Create Asset
 Create an asset using the following `curl` command:
 ```shell
-curl --location 'http://localhost/trudy/management/v2/assets' \
+curl --location 'http://localhost/trudy/management/v3/assets' \
 --header 'Content-Type: application/json' \
 --header 'X-Api-Key: password' \
 --data-raw '{
-    "@context": {},
-    "asset": {
-        "@type": "Asset",
-        "@id": "1", 
-        "properties": {
-            "description": "Product EDC Demo Asset 1"
-        }
-    },
-    "dataAddress": {
-        "@type": "DataAddress",
-        "type": "HttpData",
-        "baseUrl": "https://jsonplaceholder.typicode.com/todos/1"
-    }
+  "@context": {},
+  "@id": "1",
+  "properties": {
+    "description": "Product EDC Demo Asset 1"
+  },
+  "dataAddress": {
+    "@type": "DataAddress",
+    "type": "HttpData",
+    "baseUrl": "https://jsonplaceholder.typicode.com/todos/1"
+  }
 }'
 ```
 This `curl` command can be used to fetch Trudy's assets:
@@ -845,13 +843,7 @@ curl --location 'http://localhost/alice/management/v2/catalog/request' \
     "counterPartyAddress": "http://trudy-controlplane:8084/api/v1/dsp",
     "querySpec": {
         "offset": 0,
-        "limit": 100,
-        "filter": "",
-        "range": {
-            "from": 0,
-            "to": 100
-        },
-        "criterion": ""
+        "limit": 50
     }
 }'
 ```
@@ -935,13 +927,7 @@ curl --location 'http://localhost/bob/management/v2/catalog/request' \
     "counterPartyAddress": "http://trudy-controlplane:8084/api/v1/dsp",
     "querySpec": {
         "offset": 0,
-        "limit": 100,
-        "filter": "",
-        "range": {
-            "from": 0,
-            "to": 100
-        },
-        "criterion": ""
+        "limit": 50
     }
 }'
 ```
