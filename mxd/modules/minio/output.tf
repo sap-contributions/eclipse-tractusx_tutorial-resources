@@ -22,9 +22,9 @@ output "minio-url" {
 }
 
 output "minio-username" {
-  value = local.minio-username
+  value = var.minio-username
 }
 
 output "minio-password" {
-  value = local.minio-password
+  value = var.minio-password
 }

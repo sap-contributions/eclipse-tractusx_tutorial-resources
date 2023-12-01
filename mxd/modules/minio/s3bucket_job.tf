@@ -33,24 +33,20 @@ resource "kubernetes_job" "create_minio_bucket" {
       spec {
         container {
           name    = "minio-client"
-          image   = "minio/mc:latest" # Use the appropriate MinIO client image
+          image   = "minio/mc"
           command = ["/bin/sh", "-c"]
-          args    = ["mc config host add minio http://${local.minio-url} ${local.minio-username} ${local.minio-password} && mc mb minio/${local.bucket-name}"]
+          args    = ["mc config host add minio http://${local.minio-url} ${var.minio-username} ${var.minio-password} && mc mb --ignore-existing minio/${local.bucket-name}"]
         }
       }
     }
   }
 }
 
-resource "kubernetes_job" "put-text-document" {
-  count = var.pre-populate-asset ? 1 : 0
-  depends_on = [kubernetes_deployment.minio,
-    kubernetes_service.minio-service,
-    kubernetes_job.create_minio_bucket,
-  kubernetes_config_map.minio-seed-collection]
+resource "kubernetes_job" "minio-upload-document" {
+  depends_on = [kubernetes_job.create_minio_bucket, kubernetes_config_map.document]
 
   metadata {
-    name = "put-text-document"
+    name = "${var.humanReadableName}-minio-upload-document"
   }
 
   spec {
@@ -59,16 +55,16 @@ resource "kubernetes_job" "put-text-document" {
     completion_mode            = "NonIndexed"
     template {
       metadata {
-        name = "put-text-document"
+        name = "${var.humanReadableName}-minio-upload-document"
       }
       spec {
         container {
           name    = "mc"
           image   = "minio/mc"
           command = ["/bin/sh", "-c"]
-          args    = ["mc config host add minio http://${local.minio-url} ${local.minio-username} ${local.minio-password} && mc cp /opt/config/${local.minio-seed_collection_name} minio/${local.bucket-name}/document.txt"]
+          args    = ["mc config host add minio http://${local.minio-url} ${var.minio-username} ${var.minio-password} && mc cp /opt/config/${local.file-name} minio/${local.bucket-name}/${var.humanReadableName}-${local.file-name}"]
           volume_mount {
-            name       = "minio-seed-collection"
+            name       = "${var.humanReadableName}-minio-document"
             mount_path = "/opt/config"
           }
           env {
@@ -77,17 +73,17 @@ resource "kubernetes_job" "put-text-document" {
           }
           env {
             name  = "MINIO_ROOT_USER"
-            value = local.minio-username
+            value = var.minio-username
           }
           env {
             name  = "MINIO_ROOT_PASSWORD"
-            value = local.minio-password
+            value = var.minio-password
           }
         }
         volume {
-          name = "minio-seed-collection"
+          name = "${var.humanReadableName}-minio-document"
           config_map {
-            name = kubernetes_config_map.minio-seed-collection[count.index].metadata.0.name
+            name = kubernetes_config_map.document.metadata.0.name
           }
         }
         restart_policy = "Never"
@@ -96,12 +92,16 @@ resource "kubernetes_job" "put-text-document" {
   }
 }
 
-resource "kubernetes_config_map" "minio-seed-collection" {
-  count = var.pre-populate-asset ? 1 : 0
+resource "kubernetes_config_map" "document" {
   metadata {
-    name = "minio-seed-collection"
+    name = "${var.humanReadableName}-minio-document"
   }
   data = {
-    (local.minio-seed_collection_name) = file("./assets/testdocument.txt")
+    (local.file-name) = file("./assets/test-document.txt")
   }
+}
+
+locals {
+  file-name   = "test-document.txt"
+  bucket-name = "${var.humanReadableName}-bucket"
 }

@@ -27,12 +27,12 @@ resource "kubernetes_service" "minio-service" {
       app = "${var.humanReadableName}-minio"
     }
     port {
-      name = "minio-api"
+      name = "api-port"
       port = var.minio-api-port
 
     }
     port {
-      name = "minio-interface"
+      name = "console-port"
       port = var.minio-console-port
     }
   }

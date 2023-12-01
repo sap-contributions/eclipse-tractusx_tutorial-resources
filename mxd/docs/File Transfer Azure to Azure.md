@@ -444,7 +444,7 @@ It should return below response:
 ## 14. Validate Transfer
 Now we can validate whether file has been transferred in `bob-container` or not.  
 Once transfer is complete, it should look like this.
-[](../assets/bob-azure-container.png)
+![](../assets/bob-azure-container.png)
 
 We can also list files in container using Azure CLI.
 ```shell

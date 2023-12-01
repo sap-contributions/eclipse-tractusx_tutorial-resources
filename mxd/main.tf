@@ -49,7 +49,6 @@ provider "helm" {
 
 # First connector
 module "alice-connector" {
-  depends_on        = [module.alice-minio]
   source            = "./modules/connector"
   humanReadableName = "alice"
   participantId     = var.alice-bpn
@@ -68,19 +67,13 @@ module "alice-connector" {
     oauth-clientsecret = "alice_private_client"
   }
   minio-config = {
-    minio-url                      = module.alice-minio.minio-url
-    minio-username                 = module.alice-minio.minio-username
-    minio-password                 = module.alice-minio.minio-password
-    minio-secret-alias             = "minio-secret-alice"
-    minio-temp-access-key          = ""
-    minio-temp-secret-access-key   = ""
-    minio-temp-secret-access-token = ""
+    minio-username = "aliceawsclient"
+    minio-password = "aliceawssecret"
   }
 }
 
 # Second connector
 module "bob-connector" {
-  depends_on        = [module.bob-minio]
   source            = "./modules/connector"
   humanReadableName = "bob"
   participantId     = var.bob-bpn
@@ -99,28 +92,7 @@ module "bob-connector" {
     oauth-clientsecret = "bob_private_client"
   }
   minio-config = {
-    minio-url                      = module.bob-minio.minio-url
-    minio-username                 = module.bob-minio.minio-username
-    minio-password                 = module.bob-minio.minio-password
-    minio-secret-alias             = "minio-secret-bob"
-    minio-temp-access-key          = ""
-    minio-temp-secret-access-key   = ""
-    minio-temp-secret-access-token = ""
+    minio-username = "bobawsclient"
+    minio-password = "bobawssecret"
   }
-
-}
-
-module "alice-minio" {
-  source             = "./modules/minio"
-  humanReadableName  = "alice"
-  pre-populate-asset = true
-  minio-username     = "qwerty123"
-  minio-password     = "qwerty123"
-}
-
-module "bob-minio" {
-  source            = "./modules/minio"
-  humanReadableName = "bob"
-  minio-username    = "qwerty123"
-  minio-password    = "qwerty123"
 }

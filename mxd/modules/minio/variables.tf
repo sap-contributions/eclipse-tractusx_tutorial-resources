@@ -22,18 +22,12 @@ variable "humanReadableName" {
   description = "Human readable name of the connector, NOT the BPN!!. Required."
 }
 
-
 variable "minio-api-port" {
   default = 9000
 }
 
 variable "minio-console-port" {
   default = 9001
-}
-
-variable "pre-populate-asset" {
-  type    = bool
-  default = false
 }
 
 variable "minio-username" {
