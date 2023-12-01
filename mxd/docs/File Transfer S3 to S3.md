@@ -20,7 +20,7 @@ Following resources have already been configured.
 To access MinIO locally we need to expose the port outside our kubernetes cluster.  
 MinIO contains a web interface called MinIO Console, so we will expose its port as well.
 
-## 3.1 Connect to Alice's MinIO
+### 3.1 Connect to Alice's MinIO
 ```shell
 kubectl port-forward service/alice-minio 9000:9000 9001:9001
 ```
@@ -30,7 +30,7 @@ Now, navigate to http://localhost:9001 and login with Alice's access key id and 
 If you click on `Browse`, you can see the files stored in `alice-bucket`.
 ![alice_bucket_content.png](../assets/alice_bucket_content.png)
 
-## 3.2 Connect to Bob's MinIO
+### 3.2 Connect to Bob's MinIO
 Similarly, you can access Bob's MinIO as well. Open a new terminal and run below command.
 ```shell
 kubectl port-forward service/bob-minio 8000:9000 8001:9001
@@ -44,7 +44,7 @@ Now, navigate to http://localhost:8001 and login with Bob's access key id and se
 We can upload files either via MinIO Console or AWS CLI.
 
 ### 4.1 Via MinIO Console
-- Open Alice's MinIO Console via following steps mentioned in [previous step](#3-connect-to-minio).
+- Open Alice's MinIO Console via following steps mentioned in [previous step](#31-connect-to-alices-minio).
 - `Browse` content of the bucket `alice-bucket`.
 - Click on `Upload` button and select any sample file to upload. 
 
