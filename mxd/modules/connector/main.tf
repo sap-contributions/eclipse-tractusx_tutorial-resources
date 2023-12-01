@@ -52,8 +52,6 @@ resource "helm_release" "connector" {
     yamlencode({
       controlplane : {
         env : {
-          #          TODO remove it
-          "EDC_HOSTNAME" : "${var.humanReadableName}-tractusx-connector-controlplane"
           "TX_SSI_ENDPOINT_AUDIENCE" : "http://${kubernetes_service.controlplane-service.metadata.0.name}:8084/api/v1/dsp"
           "EDC_DSP_CALLBACK_ADDRESS" : "http://${kubernetes_service.controlplane-service.metadata.0.name}:8084/api/v1/dsp"
         }
