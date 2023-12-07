@@ -36,3 +36,5 @@ terraform.rc
 
 .idea/
 mxd/.terraform.lock.hcl
+mxd/backend-service/build
+mxd/backend-service/.gradle
