@@ -79,6 +79,7 @@ jobs:
       - name: Push image
         uses: docker/build-push-action@v5
         with:
+          working-directory: mxd/backend-service
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
