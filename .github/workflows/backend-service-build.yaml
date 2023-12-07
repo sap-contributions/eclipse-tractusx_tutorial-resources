@@ -30,6 +30,7 @@ on:
       - main
     paths:
       - 'mxd/backend-service/**'
+  workflow_dispatch:
 
 env:
   IMAGE_NAMESPACE: "tractusx"
