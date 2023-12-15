@@ -67,6 +67,10 @@ module "alice-connector" {
     oauth-secretalias  = "client_secret_alias"
     oauth-clientsecret = "alice_private_client"
   }
+  minio-config = {
+    minio-username = "aliceawsclient"
+    minio-password = "aliceawssecret"
+  }
   azure-account-name    = var.alice-azure-account-name
   azure-account-key     = local.alice-azure-key-base64
   azure-account-key-sas = var.alice-azure-key-sas
@@ -92,6 +96,10 @@ module "bob-connector" {
     oauth-clientid     = "bob_private_client"
     oauth-secretalias  = "client_secret_alias"
     oauth-clientsecret = "bob_private_client"
+  }
+  minio-config = {
+    minio-username = "bobawsclient"
+    minio-password = "bobawssecret"
   }
   azure-account-name    = var.bob-azure-account-name
   azure-account-key     = local.bob-azure-key-base64

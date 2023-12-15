@@ -17,6 +17,13 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
+module "minio" {
+  source            = "../minio"
+  humanReadableName = lower(var.humanReadableName)
+  minio-username    = var.minio-config.minio-username
+  minio-password    = var.minio-config.minio-password
+}
+
 resource "helm_release" "connector" {
   name              = lower(var.humanReadableName)
   force_update      = true
@@ -37,7 +44,7 @@ resource "helm_release" "connector" {
           "postStart" : [
             "sh",
             "-c",
-            "sleep 5 && /bin/vault kv put secret/client-secret content=${local.client_secret} && /bin/vault kv put secret/aes-keys content=${local.aes_key_b64} && /bin/vault kv put secret/${var.ssi-config.oauth-secretalias} content=${var.ssi-config.oauth-clientsecret} && /bin/vault kv put secret/${var.azure-account-name}-key content=${var.azure-account-key} && /bin/vault kv put secret/${var.azure-account-name}-sas content='${local.azure-sas-token}'"
+            "sleep 5 && /bin/vault kv put secret/client-secret content=${local.client_secret} && /bin/vault kv put secret/aes-keys content=${local.aes_key_b64} && /bin/vault kv put secret/${var.ssi-config.oauth-secretalias} content=${var.ssi-config.oauth-clientsecret} && /bin/vault kv put secret/${var.minio-config.minio-username}-alias content='${local.minio-secret}' && /bin/vault kv put secret/${var.azure-account-name}-key content=${var.azure-account-key} && /bin/vault kv put secret/${var.azure-account-name}-sas content='${local.azure-sas-token}' "
           ]
         }
       }
@@ -67,6 +74,10 @@ resource "helm_release" "connector" {
         }
       }
       dataplane : {
+        aws : {
+          endpointOverride : "http://${local.minio-url}"
+          accessKeyId : var.minio-config.minio-username
+          secretAccessKey : var.minio-config.minio-password
         env : {
           "EDC_BLOBSTORE_ENDPOINT_TEMPLATE" : local.edc-blobstore-endpoint-template
         }
@@ -119,6 +130,16 @@ resource "random_string" "aes_key_raw" {
 }
 
 locals {
+  aes_key_b64   = base64encode(random_string.aes_key_raw.result)
+  client_secret = base64encode(random_string.kc_client_secret.result)
+  jdbcUrl       = "jdbc:postgresql://${var.database-host}:${var.database-port}/${var.database-name}"
+
+  minio-url = module.minio.minio-url
+  minio-secret = jsonencode({
+    edctype         = "dataspaceconnector:secrettoken"
+    accessKeyId     = var.minio-config.minio-username
+    secretAccessKey = var.minio-config.minio-password
+  })
   aes_key_b64                     = base64encode(random_string.aes_key_raw.result)
   client_secret                   = base64encode(random_string.kc_client_secret.result)
   jdbcUrl                         = "jdbc:postgresql://${var.database-host}:${var.database-port}/${var.database-name}"

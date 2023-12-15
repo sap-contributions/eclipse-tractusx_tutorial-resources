@@ -64,6 +64,13 @@ variable "ssi-config" {
   }
 }
 
+variable "minio-config" {
+  default = {
+    minio-username = ""
+    minio-password = ""
+  }
+}
+
 variable "azure-account-name" {
   description = "Azure Account Name for the connector"
 }
