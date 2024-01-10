@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mxd-performance-test
+spec:
+  containers:
+    - name: mxd-performance-test
+      image: hemantxpatel/mxd-performance-test
+  restartPolicy: Never

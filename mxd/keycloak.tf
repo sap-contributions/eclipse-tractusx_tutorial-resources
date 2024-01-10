@@ -117,12 +117,13 @@ resource "kubernetes_config_map" "keycloak_env" {
     KEYCLOAK_ADMIN_PASSWORD    = "admin"
     # the KC_HOSTNAME must be known in advance, so that Keycloak's token contain valid `iss` claims
 
-    KC_HOSTNAME       = local.keycloak-ip
-    KC_HEALTH_ENABLED = true
-    MIW_BPN           = var.miw-bpn
-    ALICE_BPN         = var.alice-bpn
-    BOB_BPN           = var.bob-bpn
-    TRUDY_BPN         = var.trudy-bpn
+    KC_HOSTNAME              = local.keycloak-ip
+    KC_HEALTH_ENABLED        = true
+    MIW_BPN                  = var.miw-bpn
+    ALICE_BPN                = var.alice-bpn
+    BOB_BPN                  = var.bob-bpn
+    TRUDY_BPN                = var.trudy-bpn
+    PROXY_ADDRESS_FORWARDING = true
   }
 }
 
@@ -146,6 +147,6 @@ resource "kubernetes_service" "keycloak" {
 }
 
 locals {
-  keycloak-ip  = "10.96.103.80"
-  keycloak-url = "${local.keycloak-ip}:${var.keycloak-port}"
+  keycloak-ip  = "100.104.103.180"
+  keycloak-url = "http://${local.keycloak-ip}:${var.keycloak-port}"
 }

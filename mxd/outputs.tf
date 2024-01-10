@@ -62,13 +62,13 @@ output "miw-database-credentials" {
   }
 }
 
-output "bob-urls" {
-  value = module.bob-connector.urls
-}
-
-output "alice-urls" {
-  value = module.alice-connector.urls
-}
+#output "bob-urls" {
+#  value = module.bob-connector.urls
+#}
+#
+#output "alice-urls" {
+#  value = module.alice-connector.urls
+#}
 
 output "bob-node-ip" {
   value = module.bob-connector.node-ip
