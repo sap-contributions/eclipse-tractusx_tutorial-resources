@@ -33,10 +33,6 @@ output "connector2-client-secret" {
   value = module.bob-connector.client_secret
 }
 
-output "postgres-url" {
-  value = "jdbc:postgresql://${local.pg-host}/"
-}
-
 output "keycloak-cluster-ip" {
   value = kubernetes_service.keycloak.spec.0.cluster_ip
 }
@@ -44,9 +40,9 @@ output "keycloak-cluster-ip" {
 
 output "keycloak-database-credentials" {
   value = {
-    user     = var.keycloak-db-user
-    password = nonsensitive(local.kc-pg-pwd)
-    database = var.keycloak-database
+    user     = module.keycloak-postgres.database-username
+    password = module.keycloak-postgres.database-password
+    database = module.keycloak-postgres.database-name
   }
 }
 
@@ -56,9 +52,9 @@ output "miw-cluster-ip" {
 output "miw-database-credentials" {
 
   value = {
-    user     = var.miw-db-user
-    password = nonsensitive(local.miw-pg-pwd)
-    database = var.miw-database
+    user     = module.miw-postgres.database-username
+    password = module.miw-postgres.database-password
+    database = module.miw-postgres.database-name
   }
 }
 

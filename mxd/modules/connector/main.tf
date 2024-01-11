@@ -17,6 +17,15 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
+module "postgres" {
+  source = "../postgres"
+
+  database-name     = var.database-name
+  database-username = var.database-credentials.user
+  database-password = var.database-credentials.password
+  database-port     = var.database-port
+}
+
 resource "helm_release" "connector" {
   name              = lower(var.humanReadableName)
   force_update      = true
@@ -112,5 +121,5 @@ resource "random_string" "aes_key_raw" {
 locals {
   aes_key_b64   = base64encode(random_string.aes_key_raw.result)
   client_secret = base64encode(random_string.kc_client_secret.result)
-  jdbcUrl       = "jdbc:postgresql://${var.database-host}:${var.database-port}/${var.database-name}"
+  jdbcUrl       = "jdbc:postgresql://${module.postgres.database-url}/${var.database-name}"
 }

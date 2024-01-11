@@ -17,31 +17,26 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-# configuration values for the MIW+Keycloak Postgres db
-variable "postgres-port" {
-  default = 5432
+output "database-name" {
+  value = var.database-name
 }
 
-variable "keycloak-port" {
-  default = 8080
+output "database-username" {
+  value = var.database-username
 }
 
-variable "miw-api-port" {
-  default = 8000
+output "database-password" {
+  value = var.database-password
 }
 
-variable "miw-bpn" {
-  default = "BPNL000000000000"
+output "database-host" {
+  value = local.db-ip
 }
 
-variable "alice-bpn" {
-  default = "BPNL000000000001"
+output "database-port" {
+  value = var.database-port
 }
 
-variable "bob-bpn" {
-  default = "BPNL000000000002"
-}
-
-variable "trudy-bpn" {
-  default = "BPNL000000000003"
+output "database-url" {
+  value = local.db-url
 }
