@@ -56,6 +56,14 @@ resource "helm_release" "connector" {
         env : {
           "TX_SSI_ENDPOINT_AUDIENCE" : "http://${kubernetes_service.controlplane-service.metadata.0.name}:8084/api/v1/dsp"
           "EDC_DSP_CALLBACK_ADDRESS" : "http://${kubernetes_service.controlplane-service.metadata.0.name}:8084/api/v1/dsp"
+          "EDC_DATASOURCE_ASSET_POOL_CONNECTIONS_MAX-TOTAL" : 32
+          "EDC_DATASOURCE_POLICY_POOL_CONNECTIONS_MAX-TOTAL" : 32
+          "EDC_DATASOURCE_CONTRACTDEFINITION_POOL_CONNECTIONS_MAX-TOTAL" : 32
+          "EDC_DATASOURCE_CONTRACTNEGOTIATION_POOL_CONNECTIONS_MAX-TOTAL" : 32
+          "EDC_DATASOURCE_TRANSFERPROCESS_POOL_CONNECTIONS_MAX-TOTAL" : 32
+          "EDC_DATASOURCE_EDR_POOL_CONNECTIONS_MAX-TOTAL" : 32
+          "EDC_DATASOURCE_BPN_POOL_CONNECTIONS_MAX-TOTAL" : 32
+          "JAVA_TOOL_OPTIONS" : "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044 -Dcom.sun.management.jmxremote.port=3333 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
         }
         ssi : {
           miw : {
