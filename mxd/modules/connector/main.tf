@@ -46,7 +46,18 @@ resource "helm_release" "connector" {
           "postStart" : [
             "sh",
             "-c",
-            "sleep 5 && /bin/vault kv put secret/client-secret content=${local.client_secret} && /bin/vault kv put secret/aes-keys content=${local.aes_key_b64} && /bin/vault kv put secret/${var.ssi-config.oauth-secretalias} content=${var.ssi-config.oauth-clientsecret}"
+            join(" && ", [
+              "sleep 5",
+              "/bin/vault kv put secret/client-secret content=${local.client_secret}",
+              "/bin/vault kv put secret/aes-keys content=${local.aes_key_b64}",
+              "/bin/vault kv put secret/${var.ssi-config.oauth-secretalias} content=${var.ssi-config.oauth-clientsecret}",
+              "/bin/vault kv put secret/edc.aws.access.key content=${var.minio-config.minio-username}",
+              "/bin/vault kv put secret/edc.aws.secret.access.key content=${var.minio-config.minio-password}",
+              "/bin/vault kv put secret/${var.azure-account-name}-key content=${var.azure-account-key}",
+              "/bin/vault kv put secret/${var.azure-account-name}-sas content='${local.azure-sas-token}'",
+              "/bin/vault kv put secret/transferProxyTokenSignerPrivateKey content='${tls_private_key.transfer_proxy_privatekey.private_key_pem}'",
+              "/bin/vault kv put secret/transferProxyTokenSignerPublicKey content='${tls_private_key.transfer_proxy_privatekey.public_key_pem}'",
+            ])
           ]
         }
       }
@@ -123,6 +134,10 @@ resource "random_string" "kc_client_secret" {
 
 resource "random_string" "aes_key_raw" {
   length = 16
+}
+
+resource "tls_private_key" "transfer_proxy_privatekey" {
+  algorithm = "ED25519"
 }
 
 locals {
