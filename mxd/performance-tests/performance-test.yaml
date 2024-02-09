@@ -6,5 +6,5 @@ spec:
   containers:
     - name: mxd-performance-test
       image: hemantxpatel/mxd-performance-test
-      args: ["-q", "M"]
+      args: ["-q", "S"]
   restartPolicy: Never
