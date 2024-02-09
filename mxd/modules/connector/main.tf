@@ -56,9 +56,7 @@ resource "helm_release" "connector" {
         env : {
           "TX_SSI_ENDPOINT_AUDIENCE" : "http://${kubernetes_service.controlplane-service.metadata.0.name}:8084/api/v1/dsp"
           "EDC_DSP_CALLBACK_ADDRESS" : "http://${kubernetes_service.controlplane-service.metadata.0.name}:8084/api/v1/dsp"
-          "JAVA_TOOL_OPTIONS" : "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044 -Dcom.sun.management.jmxremote.port=3333 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
           "EDC_HOSTNAME" : "${var.humanReadableName}-tractusx-connector-controlplane"
-          "EDC_BLOBSTORE_ENDPOINT_TEMPLATE" : local.edc-blobstore-endpoint-template
           "EDC_DATAPLANE_SELECTOR_DEFAULTPLANE_SOURCETYPES" : "HttpData,AmazonS3,AzureStorage"
           "EDC_DATAPLANE_SELECTOR_DEFAULTPLANE_DESTINATIONTYPES" : "HttpProxy,AmazonS3,AzureStorage"
           "EDC_DATASOURCE_POLICY-MONITOR_NAME" : "policy-monitor"
