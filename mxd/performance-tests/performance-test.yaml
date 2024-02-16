@@ -5,6 +5,18 @@ metadata:
 spec:
   containers:
     - name: mxd-performance-test
-      image: hemantxpatel/mxd-performance-test
-      args: ["-q", "S"]
+      image: ciprian2398/mxd-performance-test:0.0.8-SNAPSHOT
+      envFrom:
+        - configMapRef:
+            name: special-config
+      volumeMounts:
+      - name: property-volume
+        mountPath: /opt/apache-jmeter-5.5/mxd-performance-evaluation/custom_experiment.properties
+        subPath: custom_experiment.properties
+
+  volumes:
+    - name: property-volume
+      configMap:
+        name: custom-property
+
   restartPolicy: Never
