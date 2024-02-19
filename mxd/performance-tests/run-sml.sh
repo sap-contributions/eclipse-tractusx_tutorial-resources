@@ -109,7 +109,7 @@ function copyFileWhenTestsReady {
     logs=$(kubectl logs --tail=5 "$POD_NAME" 2>/dev/null)
     if echo "$logs" | grep -q "$LOG_MESSAGE"; then
       info "Log message found in the logs."
-      kubectl cp --retries=-1 "${POD_NAME}:${GENERATED_OUTPUT_FILE}" "output_${size}.tar" | debug || error_exit "Failed to copy output file"
+      kubectl cp --retries=-1 "${POD_NAME}:${GENERATED_OUTPUT_FILE}" "output_${size}_$(date +%d-%m-%YT%H-%M-%S).tar" | debug || error_exit "Failed to copy output file"
       info "Test Report downloaded with name output_${size}.tar"
       break
     else

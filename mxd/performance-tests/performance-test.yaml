@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: mxd-performance-test
-      image: ciprian2398/mxd-performance-test:0.0.8-SNAPSHOT
+      image: ciprian2398/mxd-performance-test:0.0.9-SNAPSHOT
       envFrom:
         - configMapRef:
             name: special-config
