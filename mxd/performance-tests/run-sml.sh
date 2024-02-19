@@ -2,66 +2,42 @@
 
 # Function to display help information
 function display_help {
-    echo "Usage: $0 [OPTIONS]"
     echo "Options:"
-    echo "  -m MODE      Set t-shirt size(s) as a coma-separated list (e.g., \"S,M,L,C\")"
-    echo "               C - custom property file provided with -c param will be used"
-    echo "               S-small, M-medium, L-large"
-    echo "               Default S"
-    echo "  -l LOG_MSG   Set the log message which indicates the finis of test execution (default: \"Test Completed\")"
-    echo "  -p POD_NAME  Set the pod name (default: \"mxd-performance-test\")"
-    echo "  -g OUTPUT    Set the generated output file (default: \"/opt/apache-jmeter-5.5/mxd-performance-evaluation/output.tar\")"
-    echo "  -t TERRAFORM Set the Terraform directory (default: \"/Users/ciprian/IdeaProjects/tutorial-resources/mxd/\")"
-    echo "  -c CUSTOM    Set the custom properties file (default: \"custom_experiment.properties\")"
-    echo "  -o LOG_FILE  Set the log file name (default: \"sml_script_[current_datetime].logs\")"
-    echo "  -d DEBUG     Enable debug mode (default: true)"
-    echo "  -help        Display this help message"
+    echo "  -f  Set the the path to file/folder with experiment files (default: \"test-configurations/small_experiment.properties\")"
+    echo "  -l  Set the log message which indicates the finish of test execution (default: \"Test Completed\")"
+    echo "  -p  Set the pod name (default: \"mxd-performance-test\")"
+    echo "  -g  Set the generated output file path (default: \"/opt/apache-jmeter-5.5/mxd-performance-evaluation/output.tar\")"
+    echo "  -s  Set the generated output_slim file path (default: \"/opt/apache-jmeter-5.5/mxd-performance-evaluation/output_slim.tar\")"
+    echo "  -t  Set the Terraform directory (default: \"/Users/ciprian/IdeaProjects/tutorial-resources/mxd/\")"
+    echo "  -c  Set the destination name name of experiment properties file when mounting on the pod (default: \"custom_experiment.properties\")"
+    echo "  -o  Set the terraform log file name (default: \"sml_script_[current_datetime].logs\")"
+    echo "  -d  Enable debug mode (default: true)"
     exit 0
 }
 
-# List of all available t-shirt sizes
-#MODE=("S" "M" "L")
-MODE=("S")
+PROVIDED_PATH="test-configurations/small_experiment.properties"
 LOG_MESSAGE="Test Completed"
 POD_NAME="mxd-performance-test"
 GENERATED_OUTPUT_FILE="/opt/apache-jmeter-5.5/mxd-performance-evaluation/output.tar"
+GENERATED_OUTPUT_SLIM_FILE="/opt/apache-jmeter-5.5/mxd-performance-evaluation/output_slim.tar"
 TERRAFORM_CHDIR="/Users/ciprian/IdeaProjects/tutorial-resources/mxd/"
 CUSTOM_PROPERTIES="custom_experiment.properties"
 LOGFILE="sml_script_$(date +%d-%m-%YT%H-%M-%S).logs"
 IS_DEBUG=true
 
 # Parse command-line options
-while getopts "m:l:p:g:t:c:o:d:h:" opt; do
+while getopts "f:l:p:g:s:t:c:o:d:" opt; do
     case $opt in
-        m)
-            IFS=',' read -ra MODE <<< "$OPTARG"
-            ;;
+        f) PROVIDED_PATH=$OPTARG;;
         l) LOG_MESSAGE=$OPTARG;;
         p) POD_NAME=$OPTARG;;
         g) GENERATED_OUTPUT_FILE=$OPTARG;;
+        s) GENERATED_OUTPUT_SLIM_FILE=$OPTARG;;
         t) TERRAFORM_CHDIR=$OPTARG;;
         c) CUSTOM_PROPERTIES=$OPTARG;;
         o) LOGFILE=$OPTARG;;
         d) IS_DEBUG=$OPTARG;;
-        h) display_help;;
         \?) echo "Invalid option: -$OPTARG" >&2; display_help exit 1;;
-    esac
-done
-
-# Parse command-line options
-while getopts "m:l:p:g:t:c:o:d:" opt; do
-    case $opt in
-        m)
-            IFS=',' read -ra MODE <<< "$OPTARG"
-            ;;
-        l) LOG_MESSAGE=$OPTARG;;
-        p) POD_NAME=$OPTARG;;
-        g) GENERATED_OUTPUT_FILE=$OPTARG;;
-        t) TERRAFORM_CHDIR=$OPTARG;;
-        c) CUSTOM_PROPERTIES=$OPTARG;;
-        o) LOGFILE=$OPTARG;;
-        d) IS_DEBUG=$OPTARG;;
-        \?) echo "Invalid option: -$OPTARG" >&2; exit 1;;
     esac
 done
 
@@ -80,17 +56,16 @@ function debug {
 
 # Prints error messages and exits with error code
 function error_exit {
-  read IN
-  echo -e "$(date +%d-%m-%Y) $(date +%H:%M:%S) \033[31m ERROR \033[0m $@ original error: $IN"
-  exit 1
+  echo -e "$(date +%d-%m-%Y) $(date +%H:%M:%S) \033[31m ERROR \033[0m $@"
+  #cleanup
+  #exit 1
 }
 
 # Initializes the test
 function init {
-  local size=$1
-  info "Testing $size t-shirt size"
-  kubectl create configmap special-config --from-literal=JMETER_SCRIPT="" --from-literal=T_SHIRT_SIZE="$size" | debug || error_exit "Failed to create special-config configmap"
-  kubectl create configmap custom-property --from-file=custom_experiment.properties=$CUSTOM_PROPERTIES  | debug || error_exit "Failed to create configmap custom-property"
+  local experiment_file=$1
+  info "Adding ${experiment_file} on pod using custom-property configmap"
+  kubectl create configmap custom-property --from-file="${CUSTOM_PROPERTIES}"="${experiment_file}"  | debug || error_exit "Failed to create configmap with name custom-property"
   info "Init terraform"
   terraform -chdir="$TERRAFORM_CHDIR" init >> "$LOGFILE" || error_exit "Failed to initialize Terraform"
   info "Apply terraform"
@@ -103,14 +78,16 @@ function init {
 
 # Copies output file when tests are ready
 function copyFileWhenTestsReady {
-  local size=$1
+  local experiment_file=$1
   info "Waiting for the tests to finish ..."
   while true; do
     logs=$(kubectl logs --tail=5 "$POD_NAME" 2>/dev/null)
     if echo "$logs" | grep -q "$LOG_MESSAGE"; then
       info "Log message found in the logs."
-      kubectl cp --retries=-1 "${POD_NAME}:${GENERATED_OUTPUT_FILE}" "output_${size}_$(date +%d-%m-%YT%H-%M-%S).tar" | debug || error_exit "Failed to copy output file"
-      info "Test Report downloaded with name output_${size}.tar"
+      kubectl cp --retries=-1 "${POD_NAME}:${GENERATED_OUTPUT_FILE}" "${experiment_file}.tar"
+      info "Test Report downloaded with name output_${experiment_file}.tar"
+      kubectl cp --retries=-1 "${POD_NAME}:${GENERATED_OUTPUT_SLIM_FILE}" "${experiment_file}_slim.tar"
+      info "Test Report downloaded with name output_${experiment_file}_slim.tar"
       break
     else
       echo "Waiting for log message" | debug
@@ -126,8 +103,6 @@ function cleanup {
   info "Destroying pod"
   kubectl delete pod "$POD_NAME" | debug || error_exit "Failed to delete pod"
   info "Destroying configmap"
-  kubectl delete configmap special-config | debug || error_exit "Failed to delete configmap special-config"
-  info "Destroying configmap"
   kubectl delete configmap custom-property | debug || error_exit "Failed to delete configmap custom-property"
   info "Waiting for the pod to be deleted"
   kubectl wait --for=delete "pod/$POD_NAME"
@@ -135,12 +110,54 @@ function cleanup {
   exit 0
 }
 
-# Execute cleanup when CONTROL+C is invoked
-trap "cleanup" INT
+function startForSingleFile {
+  local experiment_file=$1
+  info Start experiment for file $experiment_file
 
-# Main loop
-for char in "${MODE[@]}"; do
-  init "$char"
-  copyFileWhenTestsReady "$char"
+  init "$experiment_file"
+  copyFileWhenTestsReady "$experiment_file"
   cleanup
-done
+}
+
+function startForDirectory {
+  local folder_path=$1
+  # Use an array to store the all properties file in provided folder
+  local files_array=()
+
+  # Populate the array using a loop
+  while IFS= read -r -d '' file; do
+      files_array+=("$file")
+  done < <(find "$folder_path" -type f -name "*$extension" -print0)
+
+  # Show detected files
+  for file in "${files_array[@]}"; do
+      info "Detected following properties file: $file"
+  done
+
+  # Start test for one file at a time
+  for file in "${files_array[@]}"; do
+      startForSingleFile "$file"
+  done
+}
+
+function main {
+  if [ -e "$PROVIDED_PATH" ]; then
+      if [ -f "$PROVIDED_PATH" ]; then
+          info "$PROVIDED_PATH is a file."
+          startForSingleFile "$PROVIDED_PATH"
+      elif [ -d "$PROVIDED_PATH" ]; then
+          info "$PROVIDED_PATH is a directory."
+          startForDirectory "$PROVIDED_PATH"
+      else
+          info "$PROVIDED_PATH exists but is neither a file nor a directory."
+      fi
+  else
+      info "$PROVIDED_PATH does not exist."
+  fi
+}
+
+# Execute cleanup when CONTROL+C is invoked
+trap cleanup INT
+
+# Script entry point
+main
