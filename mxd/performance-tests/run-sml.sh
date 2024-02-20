@@ -24,6 +24,7 @@ TERRAFORM_CHDIR="/Users/ciprian/IdeaProjects/tutorial-resources/mxd/"
 CUSTOM_PROPERTIES="custom_experiment.properties"
 LOGFILE="sml_script_$(date +%d-%m-%YT%H-%M-%S).logs"
 IS_DEBUG=true
+extension=".properties"
 
 # Parse command-line options
 while getopts "f:l:p:g:s:t:c:o:d:" opt; do
@@ -107,6 +108,11 @@ function cleanup {
   info "Waiting for the pod to be deleted"
   kubectl wait --for=delete "pod/$POD_NAME"
   info "Execution finished."
+}
+
+# Cleans up resources and exit
+function cleanup_and_exit {
+  cleanup
   exit 0
 }
 
@@ -157,7 +163,7 @@ function main {
 }
 
 # Execute cleanup when CONTROL+C is invoked
-trap cleanup INT
+trap cleanup_and_exit INT
 
 # Script entry point
 main
