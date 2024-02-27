@@ -26,8 +26,6 @@ if [ -z "$jmeter_script" ]; then
   $jmeter_binary -n -t setup.jmx -l output/setup.jtl -q $experiment_property
   echo "Executing measurement_interval.jmx"
   $jmeter_binary -n -t measurement_interval.jmx -l output/measurement_interval.jtl -q $experiment_property -e -o output/dashboard
-  echo "Executing tear_down.jmx"
-  $jmeter_binary -n -t tear_down.jmx -l output/tear_down.jtl -q $experiment_property
 fi
 echo "*** Performance Test End ***"
 

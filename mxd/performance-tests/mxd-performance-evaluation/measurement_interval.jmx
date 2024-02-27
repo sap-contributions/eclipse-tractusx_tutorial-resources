@@ -467,6 +467,20 @@
             <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
           </JSONPostProcessor>
           <hashTree/>
+          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Verify Contract Offer Id" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="script">var offerId = vars.get(&quot;CONTRACT_OFFER_ID&quot;)
+
+if(offerId == null || offerId.isEmpty()) {
+	AssertionResult.setFailure(true)
+	AssertionResult.setFailureMessage(&quot;CONTRACT_OFFER_ID is missing&quot;)
+}
+</stringProp>
+          </JSR223Assertion>
+          <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Initiate Negotiation" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
@@ -557,7 +571,7 @@
         </TransactionController>
         <hashTree>
           <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="Negotiation_State_Loop" enabled="true">
-            <stringProp name="WhileController.condition">${__jexl3(&quot;${NEGOTIATION_STATE}&quot; != &quot;FINALIZED&quot; &amp;&amp; 
+            <stringProp name="WhileController.condition">${__jexl3(&quot;${NEGOTIATION_STATE}&quot; != &quot;FINALIZED&quot; &amp;&amp;
 ${__jm__Negotiation_State_Loop__idx} &lt; ${MAX_NEGOTIATION_POLL_COUNT})}</stringProp>
             <stringProp name="TestPlan.comments">Loop while Negotiation State is FINALIZED</stringProp>
           </WhileController>
@@ -732,7 +746,7 @@ if(!&quot;FINALIZED&quot;.equals( currentState)) {
         </TransactionController>
         <hashTree>
           <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="Transfer_State_Loop" enabled="true">
-            <stringProp name="WhileController.condition">${__jexl3(&quot;${TRANSFER_STATE}&quot; != &quot;STARTED&quot; &amp;&amp; 
+            <stringProp name="WhileController.condition">${__jexl3(&quot;${TRANSFER_STATE}&quot; != &quot;STARTED&quot; &amp;&amp;
 ${__jm__Transfer_State_Loop__idx} &lt; ${MAX_TRANSFER_POLL_COUNT})}</stringProp>
             <stringProp name="TestPlan.comments">Loop while Transfer State is STARTED</stringProp>
           </WhileController>
@@ -1322,6 +1336,20 @@ if(!&quot;STARTED&quot;.equals( currentState)) {
             <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
           </JSONPostProcessor>
           <hashTree/>
+          <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Verify Contract Offer Id" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="script">var offerId = vars.get(&quot;CONTRACT_OFFER_ID&quot;)
+
+if(offerId == null || offerId.isEmpty()) {
+	AssertionResult.setFailure(true)
+	AssertionResult.setFailureMessage(&quot;CONTRACT_OFFER_ID is missing&quot;)
+}
+</stringProp>
+          </JSR223Assertion>
+          <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Initiate Negotiation" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
@@ -1412,7 +1440,7 @@ if(!&quot;STARTED&quot;.equals( currentState)) {
         </TransactionController>
         <hashTree>
           <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="Negotiation_State_Loop" enabled="true">
-            <stringProp name="WhileController.condition">${__jexl3(&quot;${NEGOTIATION_STATE}&quot; != &quot;FINALIZED&quot; &amp;&amp; 
+            <stringProp name="WhileController.condition">${__jexl3(&quot;${NEGOTIATION_STATE}&quot; != &quot;FINALIZED&quot; &amp;&amp;
 ${__jm__Negotiation_State_Loop__idx} &lt; ${MAX_NEGOTIATION_POLL_COUNT})}</stringProp>
             <stringProp name="TestPlan.comments">Loop while Negotiation State is FINALIZED</stringProp>
           </WhileController>
@@ -1587,7 +1615,7 @@ if(!&quot;FINALIZED&quot;.equals( currentState)) {
         </TransactionController>
         <hashTree>
           <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="Transfer_State_Loop" enabled="true">
-            <stringProp name="WhileController.condition">${__jexl3(&quot;${TRANSFER_STATE}&quot; != &quot;STARTED&quot; &amp;&amp; 
+            <stringProp name="WhileController.condition">${__jexl3(&quot;${TRANSFER_STATE}&quot; != &quot;STARTED&quot; &amp;&amp;
 ${__jm__Transfer_State_Loop__idx} &lt; ${MAX_TRANSFER_POLL_COUNT})}</stringProp>
             <stringProp name="TestPlan.comments">Loop while Transfer State is STARTED</stringProp>
           </WhileController>
