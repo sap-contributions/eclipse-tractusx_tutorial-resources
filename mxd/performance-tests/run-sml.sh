@@ -12,6 +12,7 @@ function display_help {
     echo "  -c  Set the destination name name of experiment properties file when mounting on the pod (default: \"custom_experiment.properties\")"
     echo "  -o  Set the terraform log file name (default: \"sml_script_[current_datetime].logs\")"
     echo "  -d  Enable debug mode (default: true)"
+    echo "  -m  Enable monitoring mode (default: false)"
     exit 0
 }
 
@@ -24,6 +25,7 @@ TERRAFORM_CHDIR="/Users/ciprian/IdeaProjects/tutorial-resources/mxd/"
 CUSTOM_PROPERTIES="custom_experiment.properties"
 LOGFILE="sml_script_$(date +%d-%m-%YT%H-%M-%S).logs"
 IS_DEBUG=true
+IS_MONITORING_ENABLED=false
 extension=".properties"
 
 # Parse command-line options
@@ -38,6 +40,7 @@ while getopts "f:l:p:g:s:t:c:o:d:" opt; do
         c) CUSTOM_PROPERTIES=$OPTARG;;
         o) LOGFILE=$OPTARG;;
         d) IS_DEBUG=$OPTARG;;
+        m) IS_MONITORING_ENABLED=$OPTARG;;
         \?) echo "Invalid option: -$OPTARG" >&2; display_help exit 1;;
     esac
 done
@@ -64,6 +67,21 @@ function error_exit {
 
 # Initializes the test
 function init {
+  if [[ $IS_MONITORING_ENABLED == true ]]; then
+      info "monitoring enabled"
+      helm upgrade --install otel-collector-cluster open-telemetry/opentelemetry-collector --values otel-collector-values.yaml
+
+      helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+      helm repo add jetstack https://charts.jetstack.io
+      helm repo update
+      kubectl create namespace cert-manager
+      helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.5.3
+      kubectl get pods -n cert-manager
+      kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.3/cert-manager.crds.yaml
+      helm install jaeger jaegertracing/jaeger-operator
+      kubectl apply -f jaeger-instance.yaml
+  fi
+
   local experiment_file=$1
   info "Adding ${experiment_file} on pod using custom-property configmap"
   kubectl create configmap custom-property --from-file="${CUSTOM_PROPERTIES}"="${experiment_file}"  | debug || error_exit "Failed to create configmap with name custom-property"
