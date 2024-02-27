@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: mxd-performance-test
-      image: ciprian2398/mxd-performance-test:0.1.0-SNAPSHOT
+      image: hemantxpatel/mxd-performance-test:0.1.5-SNAPSHOT
       volumeMounts:
       - name: property-volume
         mountPath: /opt/apache-jmeter-5.5/mxd-performance-evaluation/custom_experiment.properties
