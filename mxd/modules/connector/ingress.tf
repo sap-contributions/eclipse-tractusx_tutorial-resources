@@ -28,6 +28,7 @@ resource "kubernetes_ingress_v1" "mxd-ingress" {
   spec {
     ingress_class_name = "nginx"
     rule {
+      host = "edc.ingress.mxd.catena-x.shoot.canary.k8s-hana.ondemand.com"
       http {
         path {
           path = "/${var.humanReadableName}(/|$)(.*)"

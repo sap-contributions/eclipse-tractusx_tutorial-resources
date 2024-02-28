@@ -20,7 +20,7 @@ LOG_MESSAGE="Test Completed"
 POD_NAME="mxd-performance-test"
 GENERATED_OUTPUT_FILE="/opt/apache-jmeter-5.5/mxd-performance-evaluation/output.tar"
 GENERATED_OUTPUT_SLIM_FILE="/opt/apache-jmeter-5.5/mxd-performance-evaluation/output_slim.tar"
-TERRAFORM_CHDIR="/Users/ciprian/IdeaProjects/tutorial-resources/mxd/"
+TERRAFORM_CHDIR="$(dirname "$0")/.."
 CUSTOM_PROPERTIES="custom_experiment.properties"
 LOGFILE="sml_script_$(date +%d-%m-%YT%H-%M-%S).logs"
 IS_DEBUG=true
@@ -69,6 +69,9 @@ function init {
   kubectl create configmap custom-property --from-file="${CUSTOM_PROPERTIES}"="${experiment_file}"  | debug || error_exit "Failed to create configmap with name custom-property"
   info "Init terraform"
   terraform -chdir="$TERRAFORM_CHDIR" init >> "$LOGFILE" || error_exit "Failed to initialize Terraform"
+  info "Deploy Prometheus"
+  kubectl create namespace monitoring
+  kubectl apply -f prometheus | debug || error_exit "Failed to deploy Prometheus"
   info "Apply terraform"
   terraform -chdir="$TERRAFORM_CHDIR" apply -auto-approve  >> "$LOGFILE" || error_exit "Failed to apply Terraform"
   info "Start the performance-test container"
@@ -105,6 +108,9 @@ function cleanup {
   kubectl delete pod "$POD_NAME" | debug || error_exit "Failed to delete pod"
   info "Destroying configmap"
   kubectl delete configmap custom-property | debug || error_exit "Failed to delete configmap custom-property"
+  info "Destroying Prometheus"
+  kubectl delete -f prometheus | debug || error_exit "Failed to delete Prometheus"
+  kubectl delete namespace monitoring
   info "Waiting for the pod to be deleted"
   kubectl wait --for=delete "pod/$POD_NAME"
   info "Execution finished."
