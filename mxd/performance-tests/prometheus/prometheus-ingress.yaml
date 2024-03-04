@@ -11,7 +11,7 @@ metadata:
 spec:
   rules:
   # Use the host you used in your kubernetes Ingress Configurations
-  - host: 'prometheus.ingress.mxd.catena-x.shoot.canary.k8s-hana.ondemand.com'
+  - host: 'prometheus.ingress.mxd.edc-lpt.shoot.live.k8s-hana.ondemand.com'
     http:
       paths:
       - backend:
