@@ -69,17 +69,29 @@ function error_exit {
 function init {
   if [[ $IS_MONITORING_ENABLED == true ]]; then
       info "monitoring enabled"
-      helm upgrade --install otel-collector-cluster open-telemetry/opentelemetry-collector --values otel-collector-values.yaml
 
-      helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
-      helm repo add jetstack https://charts.jetstack.io
-      helm repo update
-      kubectl create namespace cert-manager
-      helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.5.3
-      kubectl get pods -n cert-manager
-      kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.3/cert-manager.crds.yaml
-      helm install jaeger jaegertracing/jaeger-operator
-      kubectl apply -f jaeger-instance.yaml
+    # Add Helm repositories
+    helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+
+    # Check if cert-manager is already installed
+    if ! kubectl get namespace cert-manager &>/dev/null; then
+        # Install cert-manager
+        kubectl create namespace cert-manager
+        helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.5.3
+        kubectl get pods -n cert-manager
+        kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.3/cert-manager.crds.yaml
+    else
+        info "cert-manager is already installed"
+    fi
+
+    # Install Jaeger
+    helm install jaeger jaegertracing/jaeger-operator
+    kubectl apply -f jaeger-instance.yaml
+
+    # Install Open Telemetry Collector
+    helm upgrade --install otel-collector-cluster open-telemetry/opentelemetry-collector --values otel-collector-values.yaml
   fi
 
   local experiment_file=$1
