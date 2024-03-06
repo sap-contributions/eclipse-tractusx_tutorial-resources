@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
-docker build -t ciprian2398/mxd-performance-test:0.3.4-SNAPSHOT .
+#todo provide your oun dockerID instead of PLACEHOLDER
+docker build -t PLACEHOLDER/mxd-performance-test:0.3.5-SNAPSHOT .
 
-docker image push ciprian2398/mxd-performance-test:0.3.4-SNAPSHOT
+docker image push PLACEHOLDER/mxd-performance-test:0.3.5-SNAPSHOT

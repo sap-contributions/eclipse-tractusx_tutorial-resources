@@ -3,7 +3,8 @@
 # Function to display help information
 function display_help {
     echo "Options:"
-    echo "  -f  Set the the path to file/folder with experiment files (default: \"test-configurations/small_experiment.properties\")"
+    echo "  -f  Set the path to file/folder with experiment files (default: \"test-configurations/small_experiment.properties\")"
+    echo "  -h* Set the docker_id used to push the docker image)"
     echo "  -l  Set the log message which indicates the finish of test execution (default: \"Test Completed\")"
     echo "  -p  Set the pod name (default: \"mxd-performance-test\")"
     echo "  -g  Set the generated output file path (default: \"/opt/apache-jmeter-5.5/mxd-performance-evaluation/output.tar\")"
@@ -12,6 +13,7 @@ function display_help {
     echo "  -c  Set the destination name name of experiment properties file when mounting on the pod (default: \"custom_experiment.properties\")"
     echo "  -o  Set the terraform log file name (default: \"sml_script_[current_datetime].logs\")"
     echo "  -d  Enable debug mode (default: true)"
+    echo "   * mandatory"
     exit 0
 }
 
@@ -25,11 +27,14 @@ CUSTOM_PROPERTIES="custom_experiment.properties"
 LOGFILE="sml_script_$(date +%d-%m-%YT%H-%M-%S).logs"
 IS_DEBUG=true
 extension=".properties"
+docker_id=""
+image_timestamp="$(date +%s)"
 
 # Parse command-line options
-while getopts "f:l:p:g:s:t:c:o:d:" opt; do
+while getopts "f:h:l:p:g:s:t:c:o:d:" opt; do
     case $opt in
         f) PROVIDED_PATH=$OPTARG;;
+        h) docker_id=$OPTARG;;
         l) LOG_MESSAGE=$OPTARG;;
         p) POD_NAME=$OPTARG;;
         g) GENERATED_OUTPUT_FILE=$OPTARG;;
@@ -41,6 +46,11 @@ while getopts "f:l:p:g:s:t:c:o:d:" opt; do
         \?) echo "Invalid option: -$OPTARG" >&2; display_help exit 1;;
     esac
 done
+
+if [ -z "$docker_id" ]; then
+  echo "Providing dockerID with -h is mandatory."
+  exit 1
+fi
 
 # Prints informational messages
 function info {
@@ -58,8 +68,8 @@ function debug {
 # Prints error messages and exits with error code
 function error_exit {
   echo -e "$(date +%d-%m-%Y) $(date +%H:%M:%S) \033[31m ERROR \033[0m $@"
-  #cleanup
-  #exit 1
+  cleanup
+  exit 1
 }
 
 # Initializes the test
@@ -74,8 +84,14 @@ function init {
   kubectl apply -f prometheus | debug || error_exit "Failed to deploy Prometheus"
   info "Apply terraform"
   terraform -chdir="$TERRAFORM_CHDIR" apply -auto-approve  >> "$LOGFILE" || error_exit "Failed to apply Terraform"
+
   info "Start the performance-test container"
-  kubectl apply -f performance-test.yaml | debug || error_exit "Failed to start performance-test container"
+  local FULL_IMAGE_NAME="${docker_id}\/mxd-performance-test:${image_timestamp}"
+  #replace {{FULL_IMAGE_NAME}} from performance-test.yaml with an actual value
+  template=`cat "performance-test.yaml" | sed "s/{{FULL_IMAGE_NAME}}/$FULL_IMAGE_NAME/g"`
+  # apply the yml with the substituted value
+  echo "$template" | kubectl apply -f -
+
   info "Waiting for container ready state"
   kubectl wait --for=condition=ready "pod/$POD_NAME" | debug || error_exit "Container failed to reach ready state"
 }
@@ -153,6 +169,11 @@ function startForDirectory {
 }
 
 function main {
+  info "Building a new docker image"
+  docker build -t "${docker_id}/mxd-performance-test:${image_timestamp}" mxd-performance-evaluation --quiet | debug
+  info "Pushing the new docker image"
+  docker image push "${docker_id}/mxd-performance-test:${image_timestamp}" --quiet | debug
+
   if [ -e "$PROVIDED_PATH" ]; then
       if [ -f "$PROVIDED_PATH" ]; then
           info "$PROVIDED_PATH is a file."
