@@ -4,12 +4,11 @@ import numpy as np
 import mplcursors
 import os
 import random
-
+import sys
 
 def extract_values(file_path):
     """
-    Extract values from
-     a metadata file.
+    Extract values from a metadata file.
     """
     values = {}
     with open(file_path, 'r') as file:
@@ -63,12 +62,17 @@ def plot_data(stats, labels, value, meta_values_list):
     plt.show()
 
 
-def main(root_folder, value_names, processes):
+def main(root_folder=None):
     """
     Main function to aggregate and plot data.
     """
-    directories = [os.path.join(root_folder, o) for o in os.listdir(root_folder) if
-                   os.path.isdir(os.path.join(root_folder, o))]
+    if root_folder is None:
+        root_folder = '.'  # Set current folder if no root_folder provided
+
+    value_names = ['meanResTime', 'sampleCount']
+    processes = ['Get Transfer State', 'Initiate Transfer']
+
+    directories = [os.path.join(root_folder, o) for o in os.listdir(root_folder) if os.path.isdir(os.path.join(root_folder, o))]
 
     for action_to_consider in processes:
         for value in value_names:
@@ -96,7 +100,7 @@ def main(root_folder, value_names, processes):
 
 
 if __name__ == "__main__":
-    root_folder = './Ergebnisse'
-    value_names = ['meanResTime', 'sampleCount']
-    processes = ['Get Transfer State', 'Initiate Transfer']
-    main(root_folder, value_names, processes)
+    if len(sys.argv) > 1:
+        main(sys.argv[1])
+    else:
+        main()
