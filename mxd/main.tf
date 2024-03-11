@@ -38,12 +38,14 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path    = "~/.kube/config"
+  config_context = "shoot--edc-lpt--mxd"
 }
 
 provider "helm" {
   kubernetes {
-    config_path = "~/.kube/config"
+    config_path    = "~/.kube/config"
+    config_context = "shoot--edc-lpt--mxd"
   }
 }
 

@@ -13,6 +13,8 @@ function display_help {
     echo "  -c  Set the destination name name of experiment properties file when mounting on the pod (default: \"custom_experiment.properties\")"
     echo "  -o  Set the terraform log file name (default: \"sml_script_[current_datetime].logs\")"
     echo "  -d  Enable debug mode (default: true)"
+    echo "  -x  Test pod context (cluster used to host test pod) (default: kind-mxd)"
+    echo "  -y  Environment context (cluster used to host full blown MXD environment)  (default: shoot--edc-lpt--mxd)"
     echo "   * mandatory"
     exit 0
 }
@@ -29,9 +31,11 @@ IS_DEBUG=true
 extension=".properties"
 docker_id=""
 image_timestamp="$(date +%s)"
+TEST_POD_CONTEXT="kind-mxd"
+TEST_ENVIRONMENT_CONTEXT="shoot--edc-lpt--mxd"
 
 # Parse command-line options
-while getopts "f:h:l:p:g:s:t:c:o:d:" opt; do
+while getopts "f:h:l:p:g:s:t:c:o:d:x:y:" opt; do
     case $opt in
         f) PROVIDED_PATH=$OPTARG;;
         h) docker_id=$OPTARG;;
@@ -43,6 +47,8 @@ while getopts "f:h:l:p:g:s:t:c:o:d:" opt; do
         c) CUSTOM_PROPERTIES=$OPTARG;;
         o) LOGFILE=$OPTARG;;
         d) IS_DEBUG=$OPTARG;;
+        x) TEST_POD_CONTEXT=$OPTARG;;
+        y) TEST_ENVIRONMENT_CONTEXT=$OPTARG;;
         \?) echo "Invalid option: -$OPTARG" >&2; display_help exit 1;;
     esac
 done
@@ -76,24 +82,24 @@ function error_exit {
 function init {
   local experiment_file=$1
   info "Adding ${experiment_file} on pod using custom-property configmap"
-  kubectl create configmap custom-property --from-file="${CUSTOM_PROPERTIES}"="${experiment_file}"  | debug || error_exit "Failed to create configmap with name custom-property"
+  kubectl create configmap custom-property --from-file="${CUSTOM_PROPERTIES}"="${experiment_file}" --context="${TEST_POD_CONTEXT}"  | debug || error_exit "Failed to create configmap with name custom-property"
   info "Init terraform"
   terraform -chdir="$TERRAFORM_CHDIR" init >> "$LOGFILE" || error_exit "Failed to initialize Terraform"
   info "Deploy Prometheus"
-  kubectl create namespace monitoring
-  kubectl apply -f prometheus | debug || error_exit "Failed to deploy Prometheus"
+  kubectl create namespace monitoring --context="${TEST_ENVIRONMENT_CONTEXT}"
+  kubectl apply -f prometheus --context="${TEST_ENVIRONMENT_CONTEXT}" | debug || error_exit "Failed to deploy Prometheus"
   info "Apply terraform"
   terraform -chdir="$TERRAFORM_CHDIR" apply -auto-approve  >> "$LOGFILE" || error_exit "Failed to apply Terraform"
 
-  info "Start the performance-test container"
+  info "Start the performance-test pod"
   local FULL_IMAGE_NAME="${docker_id}\/mxd-performance-test:${image_timestamp}"
   #replace {{FULL_IMAGE_NAME}} from performance-test.yaml with an actual value
   template=`cat "performance-test.yaml" | sed "s/{{FULL_IMAGE_NAME}}/$FULL_IMAGE_NAME/g"`
   # apply the yml with the substituted value
-  echo "$template" | kubectl apply -f -
+  echo "$template" | kubectl apply --context="${TEST_POD_CONTEXT}" -f -
 
-  info "Waiting for container ready state"
-  kubectl wait --for=condition=ready "pod/$POD_NAME" | debug || error_exit "Container failed to reach ready state"
+  info "Waiting for test pod ready state"
+  kubectl wait --for=condition=ready "pod/$POD_NAME" --context="${TEST_POD_CONTEXT}"  | debug || error_exit "Test pod failed to reach ready state"
 }
 
 # Copies output file when tests are ready
@@ -101,12 +107,12 @@ function copyFileWhenTestsReady {
   local experiment_file=$1
   info "Waiting for the tests to finish ..."
   while true; do
-    logs=$(kubectl logs --tail=5 "$POD_NAME" 2>/dev/null)
+    logs=$(kubectl logs --tail=5 "$POD_NAME" --context="${TEST_POD_CONTEXT}" 2>/dev/null)
     if echo "$logs" | grep -q "$LOG_MESSAGE"; then
       info "Log message found in the logs."
-      kubectl cp --retries=-1 "${POD_NAME}:${GENERATED_OUTPUT_FILE}" "${experiment_file}.tar"
+      kubectl cp --retries=-1 "${POD_NAME}:${GENERATED_OUTPUT_FILE}" "${experiment_file}.tar" --context="${TEST_POD_CONTEXT}"
       info "Test Report downloaded with name output_${experiment_file}.tar"
-      kubectl cp --retries=-1 "${POD_NAME}:${GENERATED_OUTPUT_SLIM_FILE}" "${experiment_file}_slim.tar"
+      kubectl cp --retries=-1 "${POD_NAME}:${GENERATED_OUTPUT_SLIM_FILE}" "${experiment_file}_slim.tar" --context="${TEST_POD_CONTEXT}"
       info "Test Report downloaded with name output_${experiment_file}_slim.tar"
       break
     else
@@ -120,15 +126,15 @@ function copyFileWhenTestsReady {
 function cleanup {
   info "Destroying terraform"
   terraform -chdir="$TERRAFORM_CHDIR" destroy -auto-approve >> "$LOGFILE" || error_exit "Failed to destroy Terraform"
-  info "Destroying pod"
-  kubectl delete pod "$POD_NAME" | debug || error_exit "Failed to delete pod"
+  info "Destroying test pod"
+  kubectl delete pod "$POD_NAME" --context="${TEST_POD_CONTEXT}" | debug || error_exit "Failed to delete test pod"
   info "Destroying configmap"
-  kubectl delete configmap custom-property | debug || error_exit "Failed to delete configmap custom-property"
+  kubectl delete configmap custom-property --context="${TEST_POD_CONTEXT}" | debug || error_exit "Failed to delete configmap custom-property"
   info "Destroying Prometheus"
-  kubectl delete -f prometheus | debug || error_exit "Failed to delete Prometheus"
-  kubectl delete namespace monitoring
-  info "Waiting for the pod to be deleted"
-  kubectl wait --for=delete "pod/$POD_NAME"
+  kubectl delete -f prometheus --context="${TEST_ENVIRONMENT_CONTEXT}" | debug || error_exit "Failed to delete Prometheus"
+  kubectl delete namespace monitoring --context="${TEST_ENVIRONMENT_CONTEXT}"
+  info "Waiting for the test pod to be deleted"
+  kubectl wait --for=delete "pod/$POD_NAME" --context="${TEST_POD_CONTEXT}"
   info "Execution finished."
 }
 
