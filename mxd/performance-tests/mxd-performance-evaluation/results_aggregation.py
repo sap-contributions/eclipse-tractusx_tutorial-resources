@@ -73,30 +73,37 @@ def main(root_folder=None):
     processes = ['Get Transfer State', 'Initiate Transfer']
 
     directories = [os.path.join(root_folder, o) for o in os.listdir(root_folder) if os.path.isdir(os.path.join(root_folder, o))]
+    directories_with_metadata_and_stats = []
 
-    for action_to_consider in processes:
-        for value in value_names:
-            stats = []
-            labels = []
-            meta_values_list = []
+    for directory in directories:
+        metadata_path = os.path.join(directory, 'metadata.txt')
+        statistics_path = os.path.join(directory, 'dashboard/statistics.json')
 
-            for directory in directories:
-                metadata_path = os.path.join(directory, 'metadata.txt')
-                statistics_path = os.path.join(directory, 'dashboard/statistics.json')
+        if os.path.exists(metadata_path) and os.path.exists(statistics_path):
+            directories_with_metadata_and_stats.append(directory)
 
-                if os.path.exists(metadata_path) and os.path.exists(statistics_path):
-                    meta_values = extract_values(metadata_path)
-                    stats_data = load_stats(statistics_path)
+    for directory in directories_with_metadata_and_stats:
+        metadata_path = os.path.join(directory, 'metadata.txt')
+        statistics_path = os.path.join(directory, 'dashboard/statistics.json')
 
-                    if action_to_consider in stats_data:
-                        action = stats_data[action_to_consider]
-                        if value in action:
-                            stats.append((meta_values['OEM_PLANTS'], action[value]))
-                            labels.append('Plants: {}, {}: {:.2f}'.format(meta_values['OEM_PLANTS'], value,
-                                                                          round(action[value], 2)))
-                            meta_values_list.append(meta_values)
+        meta_values = extract_values(metadata_path)
+        stats_data = load_stats(statistics_path)
 
-            plot_data(stats, labels, value, meta_values_list)
+        stats = []
+        labels = []
+        meta_values_list = []
+
+        for action_to_consider in processes:
+            for value in value_names:
+                if action_to_consider in stats_data:
+                    action = stats_data[action_to_consider]
+                    if value in action:
+                        stats.append((meta_values['OEM_PLANTS'], action[value]))
+                        labels.append('Plants: {}, {}: {:.2f}'.format(meta_values['OEM_PLANTS'], value,
+                                                                      round(action[value], 2)))
+                        meta_values_list.append(meta_values)
+
+        plot_data(stats, labels, value, meta_values_list)
 
 
 if __name__ == "__main__":
