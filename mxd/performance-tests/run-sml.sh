@@ -4,7 +4,6 @@
 function display_help {
     echo "Options:"
     echo "  -f  Set the path to file/folder with experiment files (default: \"test-configurations/small_experiment.properties\")"
-    echo "  -h* Set the docker_id used to push the docker image)"
     echo "  -l  Set the log message which indicates the finish of test execution (default: \"Test Completed\")"
     echo "  -p  Set the pod name (default: \"mxd-performance-test\")"
     echo "  -g  Set the generated output file path (default: \"/opt/apache-jmeter-5.5/mxd-performance-evaluation/output.tar\")"
@@ -15,7 +14,6 @@ function display_help {
     echo "  -d  Enable debug mode (default: true)"
     echo "  -x  Test pod context (cluster used to host test pod) (default: kind-mxd)"
     echo "  -y  Environment context (cluster used to host full blown MXD environment)  (default: shoot--edc-lpt--mxd)"
-    echo "   * mandatory"
     exit 0
 }
 
@@ -29,16 +27,13 @@ CUSTOM_PROPERTIES="custom_experiment.properties"
 LOGFILE="sml_script_$(date +%d-%m-%YT%H-%M-%S).logs"
 IS_DEBUG=true
 extension=".properties"
-docker_id=""
-image_timestamp="$(date +%s)"
 TEST_POD_CONTEXT="kind-mxd"
 TEST_ENVIRONMENT_CONTEXT="shoot--edc-lpt--mxd"
 
 # Parse command-line options
-while getopts "f:h:l:p:g:s:t:c:o:d:x:y:" opt; do
+while getopts "f:l:p:g:s:t:c:o:d:x:y:" opt; do
     case $opt in
         f) PROVIDED_PATH=$OPTARG;;
-        h) docker_id=$OPTARG;;
         l) LOG_MESSAGE=$OPTARG;;
         p) POD_NAME=$OPTARG;;
         g) GENERATED_OUTPUT_FILE=$OPTARG;;
@@ -52,11 +47,6 @@ while getopts "f:h:l:p:g:s:t:c:o:d:x:y:" opt; do
         \?) echo "Invalid option: -$OPTARG" >&2; display_help exit 1;;
     esac
 done
-
-if [ -z "$docker_id" ]; then
-  echo "Providing dockerID with -h is mandatory."
-  exit 1
-fi
 
 # Prints informational messages
 function info {
@@ -82,7 +72,14 @@ function error_exit {
 function init {
   local experiment_file=$1
   info "Adding ${experiment_file} on pod using custom-property configmap"
-  kubectl create configmap custom-property --from-file="${CUSTOM_PROPERTIES}"="${experiment_file}" --context="${TEST_POD_CONTEXT}"  | debug || error_exit "Failed to create configmap with name custom-property"
+
+  kubectl create configmap custom-property \
+    --from-file="run_experiment.sh"="mxd-performance-evaluation/run_experiment.sh" \
+    --from-file="setup.jmx"="mxd-performance-evaluation/setup.jmx" \
+    --from-file="measurement_interval.jmx"="mxd-performance-evaluation/measurement_interval.jmx" \
+    --from-file="custom_experiment.properties"="test-configurations/small_experiment.properties" \
+    --context="shoot--ciprian--test-cluster"  | debug || error_exit "Failed to create configmap with name custom-property"
+
   info "Init terraform"
   terraform -chdir="$TERRAFORM_CHDIR" init >> "$LOGFILE" || error_exit "Failed to initialize Terraform"
   info "Deploy Prometheus"
@@ -91,12 +88,7 @@ function init {
   info "Apply terraform"
   terraform -chdir="$TERRAFORM_CHDIR" apply -auto-approve  >> "$LOGFILE" || error_exit "Failed to apply Terraform"
 
-  info "Start the performance-test pod"
-  local FULL_IMAGE_NAME="${docker_id}\/mxd-performance-test:${image_timestamp}"
-  #replace {{FULL_IMAGE_NAME}} from performance-test.yaml with an actual value
-  template=`cat "performance-test.yaml" | sed "s/{{FULL_IMAGE_NAME}}/$FULL_IMAGE_NAME/g"`
-  # apply the yml with the substituted value
-  echo "$template" | kubectl apply --context="${TEST_POD_CONTEXT}" -f -
+  kubectl apply -f performance-test.yaml --context="${TEST_POD_CONTEXT}"
 
   info "Waiting for test pod ready state"
   kubectl wait --for=condition=ready "pod/$POD_NAME" --context="${TEST_POD_CONTEXT}"  | debug || error_exit "Test pod failed to reach ready state"
@@ -175,11 +167,6 @@ function startForDirectory {
 }
 
 function main {
-  info "Building a new docker image"
-  docker build -t "${docker_id}/mxd-performance-test:${image_timestamp}" mxd-performance-evaluation --quiet | debug
-  info "Pushing the new docker image"
-  docker image push "${docker_id}/mxd-performance-test:${image_timestamp}" --quiet | debug
-
   if [ -e "$PROVIDED_PATH" ]; then
       if [ -f "$PROVIDED_PATH" ]; then
           info "$PROVIDED_PATH is a file."
