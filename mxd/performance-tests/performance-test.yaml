@@ -5,15 +5,26 @@ metadata:
 spec:
   containers:
     - name: mxd-performance-test
-      image: ciprian2398/mxd-performance-test:0.2.0-SNAPSHOT
-      volumeMounts:
+      image: justb4/jmeter:5.5
+      command: [ "/bin/sh", "-c", "cd mxd-performance-evaluation && ./run_experiment.sh" ]
+      volumeMounts: #mounting each file individually to avoid creating read-only folder in jmeter
       - name: property-volume
         mountPath: /opt/apache-jmeter-5.5/mxd-performance-evaluation/custom_experiment.properties
         subPath: custom_experiment.properties
+      - name: property-volume
+        mountPath: /opt/apache-jmeter-5.5/mxd-performance-evaluation/run_experiment.sh
+        subPath: run_experiment.sh
+      - name: property-volume
+        mountPath: /opt/apache-jmeter-5.5/mxd-performance-evaluation/setup.jmx
+        subPath: setup.jmx
+      - name: property-volume
+        mountPath: /opt/apache-jmeter-5.5/mxd-performance-evaluation/measurement_interval.jmx
+        subPath: measurement_interval.jmx
 
   volumes:
     - name: property-volume
       configMap:
         name: custom-property
+        defaultMode: 0500
 
   restartPolicy: Never

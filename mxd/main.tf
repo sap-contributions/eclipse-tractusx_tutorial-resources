@@ -29,7 +29,7 @@ terraform {
 
     keycloak = {
       source  = "mrparkers/keycloak"
-      version = "4.3.1"
+      version = "4.4.0"
     }
     kubernetes = {
       source = "hashicorp/kubernetes"
@@ -38,12 +38,14 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path    = "~/.kube/config"
+  config_context = "shoot--edc-lpt--mxd"
 }
 
 provider "helm" {
   kubernetes {
-    config_path = "~/.kube/config"
+    config_path    = "~/.kube/config"
+    config_context = "shoot--edc-lpt--mxd"
   }
 }
 

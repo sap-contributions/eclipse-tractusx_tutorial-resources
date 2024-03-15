@@ -88,7 +88,7 @@
           <stringProp name="ConstantTimer.delay">500</stringProp>
         </ConstantTimer>
         <hashTree/>
-        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <stringProp name="LoopController.loops">${SUPPLIER_PARTS_INITIAL}</stringProp>
         </LoopController>
         <hashTree>
@@ -174,7 +174,7 @@
     &quot;@type&quot;: &quot;PolicyDefinitionRequestDto&quot;,&#xd;
     &quot;@id&quot;: &quot;bpnpolicy&quot;,&#xd;
     &quot;policy&quot;: {&#xd;
-		&quot;@type&quot;: &quot;Policy&quot;,&#xd;
+		&quot;@type&quot;: &quot;odrl:Set&quot;,&#xd;
 		&quot;odrl:permission&quot; : [{&#xd;
 			&quot;odrl:action&quot; : &quot;USE&quot;,&#xd;
 			&quot;odrl:constraint&quot; : {&#xd;
@@ -383,9 +383,9 @@
     &quot;contractPolicyId&quot;: &quot;bpnpolicy&quot;,&#xd;
     &quot;assetsSelector&quot; : {&#xd;
         &quot;@type&quot; : &quot;CriterionDto&quot;,&#xd;
-        &quot;operandLeft&quot;: &quot;${EDC_NAMESPACE}id&quot;,&#xd;
+        &quot;operandLeft&quot;: &quot;${EDC_NAMESPACE}description&quot;,&#xd;
         &quot;operator&quot;: &quot;=&quot;,&#xd;
-        &quot;operandRight&quot;: &quot;${ID}&quot;&#xd;
+        &quot;operandRight&quot;: &quot;Asset which does not exist&quot;&#xd;
     }&#xd;
 }</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
@@ -394,7 +394,7 @@
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
                   <stringProp name="Header.name">X-Api-Key</stringProp>
@@ -407,7 +407,7 @@
               </collectionProp>
             </HeaderManager>
             <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response code 200 or 409" enabled="true">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response code 200 or 409">
               <collectionProp name="Asserion.test_strings">
                 <stringProp name="49586">200</stringProp>
                 <stringProp name="51517">409</stringProp>
@@ -418,7 +418,7 @@
               <intProp name="Assertion.test_type">40</intProp>
             </ResponseAssertion>
             <hashTree/>
-            <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+            <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
               <boolProp name="ResultCollector.error_logging">false</boolProp>
               <objProp>
                 <name>saveConfig</name>
@@ -494,7 +494,7 @@
             <hashTree/>
           </hashTree>
         </hashTree>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -572,7 +572,7 @@
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="SetUp OEM">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="SetUp OEM" enabled="true">
         <stringProp name="TestPlan.comments">Defining a test for the processes &quot;Create Asset&quot;, &quot;Create Policy&quot; and &quot;Create Contract Definition&quot; of the OEM</stringProp>
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">false</boolProp>
@@ -673,7 +673,7 @@
     &quot;@type&quot;: &quot;PolicyDefinitionRequestDto&quot;,&#xd;
     &quot;@id&quot;: &quot;bpnpolicy&quot;,&#xd;
     &quot;policy&quot;: {&#xd;
-		&quot;@type&quot;: &quot;Policy&quot;,&#xd;
+		&quot;@type&quot;: &quot;odrl:Set&quot;,&#xd;
 		&quot;odrl:permission&quot; : [{&#xd;
 			&quot;odrl:action&quot; : &quot;USE&quot;,&#xd;
 			&quot;odrl:constraint&quot; : {&#xd;
@@ -721,7 +721,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Contract Definitiion" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Contract Definitiion">
           <intProp name="HTTPSampler.concurrentPool">6</intProp>
           <stringProp name="HTTPSampler.path">${OEM_MANAGEMENT_URL}/v2/contractdefinitions</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -850,7 +850,7 @@
           </ResultCollector>
           <hashTree/>
         </hashTree>
-        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <stringProp name="LoopController.loops">${ADDITIONAL_CONTRACT_DEFINITIONS_OEM}</stringProp>
         </LoopController>
         <hashTree>
@@ -863,7 +863,7 @@
             <boolProp name="CounterConfig.per_user">false</boolProp>
           </CounterConfig>
           <hashTree/>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Contract Definitiion" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Contract Definitiion">
             <intProp name="HTTPSampler.concurrentPool">6</intProp>
             <stringProp name="HTTPSampler.path">${SUPPLIER_MANAGEMENT_URL}/v2/contractdefinitions</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -882,9 +882,9 @@
     &quot;contractPolicyId&quot;: &quot;bpnpolicy&quot;,&#xd;
     &quot;assetsSelector&quot; : {&#xd;
         &quot;@type&quot; : &quot;CriterionDto&quot;,&#xd;
-        &quot;operandLeft&quot;: &quot;${EDC_NAMESPACE}id&quot;,&#xd;
+        &quot;operandLeft&quot;: &quot;${EDC_NAMESPACE}description&quot;,&#xd;
         &quot;operator&quot;: &quot;=&quot;,&#xd;
-        &quot;operandRight&quot;: &quot;${ID}&quot;&#xd;
+        &quot;operandRight&quot;: &quot;Asset which does not exist&quot;&#xd;
     }&#xd;
 }</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
@@ -893,7 +893,7 @@
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
                   <stringProp name="Header.name">X-Api-Key</stringProp>
