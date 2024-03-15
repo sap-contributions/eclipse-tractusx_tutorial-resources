@@ -1,85 +1,112 @@
 import json
-import matplotlib.pyplot as plt # to install: pip3 install plotly
-import numpy as np
-import mplcursors  # to install: pip3 install mplcursors
+import plotly.graph_objects as go
 import os
-import random
+import sys
 
-############ Required Input ############
-root_folder = './Ergebnisse'
-values = ['meanResTime', 'sampleCount']
-processes = ['Get Transfer State', 'Initiate Transfer']
+def load_metadata(metadata_file):
+    """
+    Load metadata from a text file.
+    """
+    with open(metadata_file, 'r') as f:
+        metadata_content = f.read()
 
-######################################################################################
-# A function for extracting values from a given file
-def extract_values(file_path):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-    values = {}
-    for line in lines:
-        if 'OEM_PLANTS' in line:
-            values['OEM_PLANTS'] = int(line.split('=')[1].strip())
-        elif 'OEM_CARS_INITIAL' in line:
-            values['OEM_CARS_INITIAL'] = int(line.split('=')[1].strip())
-        elif 'PARTS_PER_CAR' in line:
-            values['PARTS_PER_CAR'] = int(line.split('=')[1].strip())
-        elif 'CARS_PRODUCED_PER_INTERVALL' in line:
-            values['CARS_PRODUCED_PER_INTERVALL'] = int(line.split('=')[1].strip())
-    return values
+    metadata = {}
+    current_category = None
 
-# List comprehension to gather all directories under the specified root_folder
-directories = [os.path.join(root_folder, o) for o in os.listdir(root_folder) 
-    if os.path.isdir(os.path.join(root_folder,o))]
+    for line in metadata_content.splitlines():
+        line = line.strip()
+        if line.startswith('#'):
+            current_category = line[1:].strip()
+            metadata[current_category] = {}
+        elif line:
+            key, value = line.split('=')
+            metadata[current_category][key.strip()] = value.strip()
 
-# Iterates over each action and value from the lists and creates a new figure for each combination
-for action_to_consider in processes:
-    for value_idx, value in enumerate(values):
-        plt.figure(figsize=(15, 4))
-        plt.title('Aggregation of Performance Test Results: {} for {}'.format(value, action_to_consider))
+    return metadata
 
-        stats = []
-        labels = []
-        meta_values_list = []
+def load_stats(stats_file):
+    """
+    Load statistics from a JSON file.
+    """
+    with open(stats_file, 'r') as f:
+        stats_data = json.load(f)
 
-        # Goes through each directory to find the metadata and statistics files
-        for idx, directory in enumerate(directories):
-            metadata_path = os.path.join(directory, 'metadata.txt')  
-            statistics_path = os.path.join(directory, 'dashboard/statistics.json')  
-            
-            # If both files exist in the directory, it calls the function to extract values from the metadata file
-            if os.path.exists(metadata_path) and os.path.exists(statistics_path):
-                meta_values = extract_values(metadata_path)
+    # Extract 'medianResTime' values for each process
+    extracted_data = {}
+    for process, stats in stats_data.items():
+        median_res_time = stats.get('medianResTime')
+        if median_res_time is not None:
+            extracted_data[process] = {'medianResTime': median_res_time}
 
-                # Opens the statistics.json file and loads its content
-                with open(statistics_path, 'r') as f:
-                    stats_data = json.load(f)
+    return extracted_data
 
-                # Appends the statistics for each action and the associated labels for the plot
-                action = stats_data[action_to_consider]
-                stats.append((meta_values['OEM_PLANTS'], action[value]))
-                labels.append('Plants: {}, {}: {:.2f}'.format(meta_values['OEM_PLANTS'], value, round(action[value],2)))
-                meta_values_list.append(meta_values)
+def sort_processes(processes):
+    """
+    Sort processes based on specified criteria.
+    """
+    sorted_processes = sorted(processes)
+    print("Sorted Processes:", sorted_processes)
+    return sorted_processes
 
-        # Plots the statistics data as a line plot and a scatter plot
-        plt.plot([s[0] for s in stats], [s[1] for s in stats])
-        colors = [ (random.random(), random.random(), random.random()) for _ in range(len(stats)) ]
-        scatter = plt.scatter([s[0] for s in stats], [s[1] for s in stats], color=colors)
+def plot_data(processes, stats_data, output_file):
+    """
+    Plot median response time data for each process as bar charts and save to HTML.
+    """
+    fig = go.Figure()
 
-        # Adds labels to each point on the scatter plot (that x-axis matches OEM_PLANTS values)
-        for i, text in enumerate(labels):
-            plt.text(stats[i][0], stats[i][1], text)
+    for process in processes:
+        stats = stats_data.get(process, {})
+        median_res_time = stats.get('medianResTime')  # Check if 'medianResTime' exists in stats
+        if median_res_time is not None:
+            print(f"Adding trace for {process} with medianResTime {median_res_time}")
+            fig.add_trace(go.Bar(x=[process], y=[median_res_time], name=process))
+        else:
+            print(f"No medianResTime found for {process}")
 
-        # Add cursor
-        cursor = mplcursors.cursor(scatter, hover=True)
-        @cursor.connect("add")
-        def on_add(sel):
-            i = sel.target.index
-            sel.annotation.set_text('Plants: {}, Cars: {}, Parts/Car: {}, Cars/Interval: {}'.format(
-                stats[i][0],
-                meta_values_list[i]['OEM_CARS_INITIAL'],
-                meta_values_list[i]['PARTS_PER_CAR'],
-                meta_values_list[i]['CARS_PRODUCED_PER_INTERVALL']))
+    fig.update_layout(title='Median Response Time for JMeter Calls',
+                      xaxis_title='Processes',
+                      yaxis_title='Median Response Time')
 
-        plt.xlabel('OEM_PLANTS')
-        plt.ylabel(value)
-        plt.show()
+    print("Final Figure:", fig)  # Print the figure object for debugging
+    fig.write_html(output_file)
+
+def process_folders(root_folder, output_file):
+    """
+    Process folders inside the root folder to get metadata and statistics files.
+    """
+    processes = []
+    stats_data = {}
+
+    for folder in os.listdir(root_folder):
+        folder_path = os.path.join(root_folder, folder)
+        if os.path.isdir(folder_path):
+            metadata_file = os.path.join(folder_path, 'metadata.txt')
+            dashboard_folder = os.path.join(folder_path, 'dashboard')
+            stats_file = os.path.join(dashboard_folder, 'statistics.json')
+
+            if os.path.exists(metadata_file) and os.path.exists(stats_file):
+                metadata = load_metadata(metadata_file)
+                stats = load_stats(stats_file)
+                process_name = metadata['General Parameters'].get('PROCESS_NAME', 'Unknown')
+                processes.append(process_name)
+                stats_data[process_name] = stats
+
+    sorted_processes = sort_processes(processes)
+    plot_data(sorted_processes, stats_data, output_file)
+
+def main(root_folder=None, output_file=None):
+    """
+    Main function to aggregate and plot data from folders.
+    """
+    if root_folder is None:
+        root_folder = '.'  # Set current folder if no root_folder provided
+
+    if output_file is None:
+        output_file = 'output.html'  # Set default output file name if not provided
+
+    process_folders(root_folder, output_file)
+
+if __name__ == "__main__":
+    root_folder = sys.argv[1] if len(sys.argv) > 1 else None
+    output_file = sys.argv[2] if len(sys.argv) > 2 else None
+    main(root_folder, output_file)
