@@ -16,16 +16,17 @@ terraform_dir="$(dirname "$0")/.."
 test_pod_context="kind-mxd"
 test_environment_context="kind-mxd"
 is_debug=true
-
+IS_MONITORING_ENABLED=false
 
 #Override defaults with provided command line arguments
-while getopts "f:t:x:y:d" opt; do
+while getopts "f:t:x:y:d:m" opt; do
     case $opt in
         f) path_to_test_configuration=$OPTARG;;
         t) terraform_dir=$OPTARG;;
         x) test_pod_context=$OPTARG;;
         y) test_environment_context=$OPTARG;;
         d) is_debug=$OPTARG;;
+        m) IS_MONITORING_ENABLED=true;;
         \?) cat help.txt; exit 1;;
     esac
 done
@@ -56,6 +57,41 @@ print_error_log_and_exit() {
   exit 1
 }
 
+#######################################
+# Sets up monitoring components
+# Globals: IS_MONITORING_ENABLED
+# Outputs:
+#   Installs monitoring components if enabled
+#######################################
+setup_monitoring() {
+  if [[ $IS_MONITORING_ENABLED == true ]]; then
+    print_info_log "Monitoring enabled"
+
+    # Add Helm repositories
+    helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+
+    # Check if cert-manager is already installed
+    if ! kubectl get namespace cert-manager &>/dev/null; then
+        # Install cert-manager
+        kubectl create namespace cert-manager
+        helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.5.3
+        kubectl get pods -n cert-manager
+        kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.3/cert-manager.crds.yaml
+    else
+        print_info_log "Cert-manager is already installed"
+    fi
+
+    # Install Jaeger
+    helm install jaeger jaegertracing/jaeger-operator
+    kubectl apply -f jaeger-instance.yaml
+
+    # Install Open Telemetry Collector
+    helm upgrade --install otel-collector-cluster open-telemetry/opentelemetry-collector --values otel-collector-values.yaml
+    # add a comment with port forwarding command
+  fi
+}
 
 #######################################
 # Sets up test environment
@@ -83,6 +119,8 @@ setup_test_environment() {
     --context="${test_pod_context}" \
     | print_debug_log \
     || print_error_log_and_exit "Failed to create configmap with name custom-property"
+
+  setup_monitoring
 
   print_info_log "Init terraform"
   terraform -chdir="${terraform_dir}" init \
