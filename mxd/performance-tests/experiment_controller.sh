@@ -89,7 +89,7 @@ setup_monitoring() {
 
     # Install Open Telemetry Collector
     helm upgrade --install otel-collector-cluster open-telemetry/opentelemetry-collector --values otel-collector-values.yaml
-    # add a comment with port forwarding command
+    print_info_log "To access JaegerUI please use port forwarding: kubectl port-forward <jaeger-pod-name> <local-port>:<jaeger-ui-port>"
   fi
 }
 
