@@ -1,41 +1,45 @@
 # Performance Tests run 
 
 ### 1. Introduction
-The script ```./run-sml.sh```  
-1. Deploys terraform from ```mxd```folder to remote cluster 
-2. Starts the ```mxd-performance-test``` container in the local cluster 
-which runs ```small_experiment.properties``` by default with a fresh docker image created with latest changes from .jmx files. 
+The script ```./experiment_controller.sh```  
+1. Deploys terraform from ```mxd```folder to a provided cluster 
+2. Starts the ```mxd-performance-test``` container which runs
+```small_experiment.properties``` by default with latest changes from .jmx files. 
 
 ### 2. Prerequisites
-1. Install Docker and authenticate with ```docker login```
 
-2. Make mxd-performance-test image public on your docker hub
+#### 1. Local run 
+Install kind and run ```kind create cluster -n mxd```, this will create a local cluster named ```kind-mxd```
+which is the default cluster name.
 
-3. Install kind and run ```kind create cluster -n mxd```, this will create a local cluster named ```kind-mxd```
-which is the default cluster name used in the script for hosting the performance test pod.
+#### 2. Remote run
+For remote run you don't need ```kind``` just provide the name of the remote cluster in -x and -y args. 
 
-4The second cluster ```shoot--edc-lpt--mxd```  is the remote cluster used to host other pods ex:(alice,bob,etc..).
-
-After you get the remote kube/config file, merge both files in one as described [here](https://blog.thenets.org/managing-multiples-kubernetes-clusters-with-kubectl/).
-
-Make sure you use ```shoot--edc-lpt--mxd``` and ```kind-mxd``` as context names or change them with -x -y flags.
+#### 3. Remote run in two separate clusters
+Collect .kube/config files and merge them in one as described [here](https://blog.thenets.org/managing-multiples-kubernetes-clusters-with-kubectl/).
+Then provide the name of the remote cluster for test pod with -x arg, and name of the remote cluster for rest of pods using -y arg.
 
 ### 3. Examples
+For more information about arguments visit [help.txt](help.txt)."
 
 #### Display help
-```./run-sml.sh -x```
+```./experiment_controller.sh -h```
 
-#### Run default file small_experiment.properties
-```./run-sml.sh -h myDockerID```
+#### Run default experiment file small_experiment.properties on ```kind-mxd``` cluster
+```./experiment_controller.sh```
 
-#### Run all files from test-configurations folder
-```./run-sml.sh -h myDockerID -f test-configurations```
+#### Run all files from test-configurations folder on ```kind-mxd``` cluster
+```./experiment_controller.sh -f test-configurations```
 
-#### Run just one file ex:  medium_experiment_10_contracts.properties
-```./run-sml.sh -h myDockerID -f test-configurations/medium_experiment_10_contracts.properties```
+#### Run just one file ex:  medium_experiment_10_contracts.properties  on ```kind-mxd``` cluster
+```./experiment_controller.sh -f test-configurations/medium_experiment_10_contracts.properties```
 
-#### Run large_experiment.properties with test pod on cluster from shoot--ciprian--test-cluster context
-```./run-sml.sh -h ciprian2398 -f test-configurations/large_experiment.properties -x shoot--ciprian--test-cluster```
+#### Run default experiment file small_experiment.properties on ```shoot--edc-lpt--mxd``` cluster
+```./experiment_controller.sh -x shoot--edc-lpt--mxd -y shoot--edc-lpt--mxd```
 
+####  Run default experiment file with test container on ```kind-mxd``` cluster and the rest of the environment on ```shoot--edc-lpt--mxd``` cluster
+```./experiment_controller.sh -x kind-mxd -y shoot--edc-lpt--mxd```
 
+#### Run all files from test-configurations folder on separate clusters
+```./experiment_controller.sh -f test-configurations -x kind-mxd -y shoot--edc-lpt--mxd```
 
