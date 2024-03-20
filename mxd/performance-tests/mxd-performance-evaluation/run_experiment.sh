@@ -1,5 +1,5 @@
 #!/bin/bash
-experiment_property="custom_experiment.properties"
+experiment_property="mount/custom_experiment.properties"
 
 if [ -z "$JMETER_HOME" ]; then
   echo "JMETER_HOME is not defined - please define it."
@@ -23,9 +23,10 @@ echo "*** Performance Test Start ***"
 if [ -z "$jmeter_script" ]; then
   echo "Executing all scripts in order"
   echo "Executing setup.jmx"
-  $jmeter_binary -n -t setup.jmx -l output/setup.jtl -q $experiment_property
+  $jmeter_binary -n -t mount/setup.jmx -l output/setup.jtl -q $experiment_property -j "output/jmeter.log"
   echo "Executing measurement_interval.jmx"
-  $jmeter_binary -n -t measurement_interval.jmx -l output/measurement_interval.jtl -q $experiment_property -e -o output/dashboard
+  $jmeter_binary -n -t mount/measurement_interval.jmx -l output/measurement_interval.jtl -q $experiment_property \
+    -j "output/jmeter.log" -e -o output/dashboard
 fi
 echo "*** Performance Test End ***"
 
