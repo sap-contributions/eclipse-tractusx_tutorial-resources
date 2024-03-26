@@ -1,85 +1,202 @@
 import json
-import matplotlib.pyplot as plt # to install: pip3 install plotly
-import numpy as np
-import mplcursors  # to install: pip3 install mplcursors
+import plotly.graph_objects as go
 import os
-import random
+import sys
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
-############ Required Input ############
-root_folder = './Ergebnisse'
-values = ['meanResTime', 'sampleCount']
-processes = ['Get Transfer State', 'Initiate Transfer']
+OEM_CARS_INITIAL = 'OEM_CARS_INITIAL'
+SUPPLIER_PARTS_INITIAL = 'SUPPLIER_PARTS_INITIAL'
+OEM_PLANTS = 'OEM_PLANTS'
+SUPPLIER_PLANTS = 'SUPPLIER_PLANTS'
+SUPPLIER_FLEET_MANAGERS = 'SUPPLIER_FLEET_MANAGERS'
+ADDITIONAL_CONTRACT_DEFINITIONS_OEM = 'ADDITIONAL_CONTRACT_DEFINITIONS_OEM'
+ADDITIONAL_CONTRACT_DEFINITIONS_SUPPLIER = 'ADDITIONAL_CONTRACT_DEFINITIONS_SUPPLIER'
+OEM_QUERY_CATALOGUE = 'OEM Query Catalog'
+DEFAULT_OUTPUT_FILE = 'output.html'
 
-######################################################################################
-# A function for extracting values from a given file
-def extract_values(file_path):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-    values = {}
-    for line in lines:
-        if 'OEM_PLANTS' in line:
-            values['OEM_PLANTS'] = int(line.split('=')[1].strip())
-        elif 'OEM_CARS_INITIAL' in line:
-            values['OEM_CARS_INITIAL'] = int(line.split('=')[1].strip())
-        elif 'PARTS_PER_CAR' in line:
-            values['PARTS_PER_CAR'] = int(line.split('=')[1].strip())
-        elif 'CARS_PRODUCED_PER_INTERVALL' in line:
-            values['CARS_PRODUCED_PER_INTERVALL'] = int(line.split('=')[1].strip())
-    return values
+def load_metadata(metadata_file):
+    """
+    Load metadata from a text file.
+    """
+    metadata = {}
 
-# List comprehension to gather all directories under the specified root_folder
-directories = [os.path.join(root_folder, o) for o in os.listdir(root_folder) 
-    if os.path.isdir(os.path.join(root_folder,o))]
+    with open(metadata_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if "=" in line:
+                key, value = line.split('=')
+                metadata[key.strip()] = value.strip()
+    return metadata
 
-# Iterates over each action and value from the lists and creates a new figure for each combination
-for action_to_consider in processes:
-    for value_idx, value in enumerate(values):
-        plt.figure(figsize=(15, 4))
-        plt.title('Aggregation of Performance Test Results: {} for {}'.format(value, action_to_consider))
 
-        stats = []
-        labels = []
-        meta_values_list = []
+def load_stats(stat_file):
+    """
+    Load statistics from a JSON file.
+    """
+    with open(stat_file, 'r') as file:
+        data = json.load(file)
 
-        # Goes through each directory to find the metadata and statistics files
-        for idx, directory in enumerate(directories):
-            metadata_path = os.path.join(directory, 'metadata.txt')  
-            statistics_path = os.path.join(directory, 'dashboard/statistics.json')  
-            
-            # If both files exist in the directory, it calls the function to extract values from the metadata file
-            if os.path.exists(metadata_path) and os.path.exists(statistics_path):
-                meta_values = extract_values(metadata_path)
+    processes_data = {}
 
-                # Opens the statistics.json file and loads its content
-                with open(statistics_path, 'r') as f:
-                    stats_data = json.load(f)
+    for process_name, process_data in data.items():
+        median_res_time = process_data['medianResTime']
+        processes_data[process_name] = median_res_time
 
-                # Appends the statistics for each action and the associated labels for the plot
-                action = stats_data[action_to_consider]
-                stats.append((meta_values['OEM_PLANTS'], action[value]))
-                labels.append('Plants: {}, {}: {:.2f}'.format(meta_values['OEM_PLANTS'], value, round(action[value],2)))
-                meta_values_list.append(meta_values)
+    return processes_data
 
-        # Plots the statistics data as a line plot and a scatter plot
-        plt.plot([s[0] for s in stats], [s[1] for s in stats])
-        colors = [ (random.random(), random.random(), random.random()) for _ in range(len(stats)) ]
-        scatter = plt.scatter([s[0] for s in stats], [s[1] for s in stats], color=colors)
 
-        # Adds labels to each point on the scatter plot (that x-axis matches OEM_PLANTS values)
-        for i, text in enumerate(labels):
-            plt.text(stats[i][0], stats[i][1], text)
+def sort_processes(processes, metadata):
+    """
+    Sort processes based on specified criteria.
+    """
+    sorted_processes = sorted(processes, key=lambda x: (
+        int(metadata[x].get(OEM_CARS_INITIAL)),
+        int(metadata[x].get(SUPPLIER_PARTS_INITIAL)),
+        int(metadata[x].get(OEM_PLANTS)),
+        int(metadata[x].get(SUPPLIER_PLANTS)),
+        int(metadata[x].get(SUPPLIER_FLEET_MANAGERS)),
+        int(metadata[x].get(ADDITIONAL_CONTRACT_DEFINITIONS_OEM)),
+        int(metadata[x].get(ADDITIONAL_CONTRACT_DEFINITIONS_SUPPLIER)),
+    ))
+    return sorted_processes
 
-        # Add cursor
-        cursor = mplcursors.cursor(scatter, hover=True)
-        @cursor.connect("add")
-        def on_add(sel):
-            i = sel.target.index
-            sel.annotation.set_text('Plants: {}, Cars: {}, Parts/Car: {}, Cars/Interval: {}'.format(
-                stats[i][0],
-                meta_values_list[i]['OEM_CARS_INITIAL'],
-                meta_values_list[i]['PARTS_PER_CAR'],
-                meta_values_list[i]['CARS_PRODUCED_PER_INTERVALL']))
 
-        plt.xlabel('OEM_PLANTS')
-        plt.ylabel(value)
-        plt.show()
+def erase_file_contents(filename):
+    if os.path.exists(filename):
+        with open(filename, 'w') as file:
+            pass
+
+
+def plot_process_data(scenarios, stats_data, output_file):
+    figures = []
+
+    all_calls = stats_data[scenarios[0]].keys()
+
+    for c in all_calls:
+        x_axis_data = []
+        y_axis_data = []
+        for s in scenarios:
+            mapping = stats_data[s]
+            if not mapping.get(c) is None:
+                response_time = stats_data[s][c]
+                y_axis_data.append(response_time)
+                x_axis_data.append(s)
+        trace = go.Bar(
+            x=x_axis_data,
+            y=y_axis_data
+        )
+
+        layout = go.Layout(
+            title=c,
+            xaxis=dict(title=c),
+            yaxis=dict(title='Median Response Time')
+        )
+        fig = go.Figure(data=[trace], layout=layout)
+        figures.append(fig)
+
+    erase_file_contents(output_file)
+
+    with open(output_file, 'a') as f:
+        for fig in figures:
+            f.write(fig.to_html(full_html=False, include_plotlyjs='cdn'))
+            f.write('<div style="height: 50px;"></div>')
+
+
+def analyze_response_time(output_file, metadata, stats_data, scenarios):
+    contract_def_list = []
+    response_time_list = []
+
+    for s in scenarios:
+        contract_def = metadata[s][ADDITIONAL_CONTRACT_DEFINITIONS_OEM]
+        response_time = stats_data[s].get(OEM_QUERY_CATALOGUE)
+
+        contract_def_list.append(float(contract_def))
+        response_time_list.append(float(response_time))
+
+    contract_def_array = np.array(contract_def_list)
+    response_time_array = np.array(response_time_list)
+
+    x = contract_def_array.reshape(-1, 1)
+    y = response_time_array
+
+    model = LinearRegression()
+    model.fit(x, y)
+
+    html_content = f"<p>Query Catalogue Resp Time(OEM)\n</p>\n"
+    html_content += f"<p>Intercept: {model.intercept_}</p>\n"
+    html_content += f"<p>Slope (Beta param): {model.coef_[0]}</p>\n"
+
+    x_prediction = np.linspace(min(contract_def_array),
+                               max(contract_def_array),
+                               100).reshape(-1, 1)
+    y_prediction = model.predict(x_prediction)
+
+    scatter_trace = go.Scatter(
+        x=contract_def_array,
+        y=response_time_array,
+        mode='markers',
+        marker=dict(color='blue'),
+        name='Data Points'
+    )
+
+    regression_line_trace = go.Scatter(
+        x=x_prediction.flatten(),
+        y=y_prediction,
+        mode='lines',
+        line=dict(color='red'),
+        name='Regression Line'
+    )
+
+    layout = go.Layout(
+        title='Linear Regression',
+        xaxis=dict(title='Amount of Contract Definition'),
+        yaxis=dict(title='Median Response Time(s)')
+    )
+
+    fig = go.Figure(data=[scatter_trace, regression_line_trace], layout=layout)
+
+    with open(output_file, 'a') as f:
+        f.write(html_content)
+        f.write(fig.to_html(full_html=False, include_plotlyjs='cdn'))
+
+
+def process_folders(root_folder, output_file):
+    """
+    Process folders inside the root folder to get metadata and statistics files.
+    """
+    scenarios = []
+    stats_data = {}
+    metadata = {}
+
+    for ex_folder in os.listdir(root_folder):
+        ex_path = os.path.join(root_folder, ex_folder)
+        if os.path.isdir(ex_path):
+            metadata_file = os.path.join(ex_path, 'metadata.txt')
+            dashboard_folder = os.path.join(ex_path, 'dashboard')
+            stats_file = os.path.join(dashboard_folder, 'statistics.json')
+
+            if os.path.exists(metadata_file) and os.path.exists(stats_file):
+                metadata[ex_folder] = load_metadata(metadata_file)
+                stats_data[ex_folder] = (load_stats(stats_file))
+                scenarios.append(ex_folder)
+
+    sorted_scenarios = sort_processes(scenarios, metadata)
+    plot_process_data(sorted_scenarios, stats_data, output_file)
+    analyze_response_time(output_file, metadata, stats_data, scenarios)
+
+
+def main(root_folder=None, output_file=None):
+    if root_folder is None:
+        root_folder = '.'
+
+    if output_file is None or not output_file.endswith('.html'):
+        output_file = DEFAULT_OUTPUT_FILE
+
+    process_folders(root_folder, output_file)
+
+
+if __name__ == "__main__":
+    root_folder = sys.argv[1] if len(sys.argv) > 1 else None
+    output_file = sys.argv[2] if len(sys.argv) > 2 else None
+    main(root_folder, output_file)

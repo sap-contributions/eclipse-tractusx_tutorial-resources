@@ -171,7 +171,13 @@ For more information about arguments visit [help.txt](help.txt).
 #### Run all files from test-configurations folder on separate clusters
 ```./experiment_controller.sh -f test-configurations -x kind-mxd -y shoot--edc-lpt--mxd```
 
-Enjoy the test results!
+### Visualizing Test Result
+1. Install python(this script is tested with python version: 3.8.10)
+2. Run the [result aggregation](mxd-performance-evaluation/results_aggregation.py) script to visualize the result. The script accepts two arguments: 
+   1. Test result folder and
+   2. Output html file name.
+
+```python3 results_aggregation.py test-result-folder output.html```
 
 ### Test results
 After executing the shell script, the test results can be viewed at /Output/measurement_interval/index.html.
