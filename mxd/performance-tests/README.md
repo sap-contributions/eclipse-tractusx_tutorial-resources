@@ -171,13 +171,25 @@ For more information about arguments visit [help.txt](help.txt).
 #### Run all files from test-configurations folder on separate clusters
 ```./experiment_controller.sh -f test-configurations -x kind-mxd -y shoot--edc-lpt--mxd```
 
-### Visualizing Test Result
-1. Install python(this script is tested with python version: 3.8.10)
-2. Run the [result aggregation](mxd-performance-evaluation/results_aggregation.py) script to visualize the result. The script accepts two arguments: 
-   1. Test result folder and
-   2. Output html file name.
+### Visualizing Aggregated Test Results
+1. Install python (this script was tested with python version: 3.8.10)
+2. Run the [result aggregation](mxd-performance-evaluation/results_aggregation.py) script to visualize the result with the following command.
+   ```python3 results_aggregation.py <test-result-folder> <output.html> --regression <operation_name>```
+3. Replace <test-result-folder> with the path to the folder containing your test results
 
-```python3 results_aggregation.py test-result-folder output.html```
+   The expected folder structure for the <test-result-folder> is as follows:
+    - Test result folder
+      - Experiment 1
+        - output_folder 
+          - metadata file
+          - dashboard folder
+              - statistics file
+      - Experiment 2...
+4. Replace <output.html> with the desired name for the output HTML file.
+5. Replace <operation_name> with desired operation name, e.g- 'OEM Query Catalog'
+
+#### Example
+```python3 results_aggregation.py test-result output.html --regression 'OEM Query Catalog'```
 
 ### Test results
 After executing the shell script, the test results can be viewed at /Output/measurement_interval/index.html.

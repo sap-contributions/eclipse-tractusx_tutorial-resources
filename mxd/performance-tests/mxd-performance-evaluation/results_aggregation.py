@@ -4,6 +4,7 @@ import os
 import sys
 import numpy as np
 from sklearn.linear_model import LinearRegression
+import argparse
 
 OEM_CARS_INITIAL = 'OEM_CARS_INITIAL'
 SUPPLIER_PARTS_INITIAL = 'SUPPLIER_PARTS_INITIAL'
@@ -12,8 +13,9 @@ SUPPLIER_PLANTS = 'SUPPLIER_PLANTS'
 SUPPLIER_FLEET_MANAGERS = 'SUPPLIER_FLEET_MANAGERS'
 ADDITIONAL_CONTRACT_DEFINITIONS_OEM = 'ADDITIONAL_CONTRACT_DEFINITIONS_OEM'
 ADDITIONAL_CONTRACT_DEFINITIONS_SUPPLIER = 'ADDITIONAL_CONTRACT_DEFINITIONS_SUPPLIER'
-OEM_QUERY_CATALOGUE = 'OEM Query Catalog'
 DEFAULT_OUTPUT_FILE = 'output.html'
+USAGE_MESSAGE = 'Usage: python3 results_aggregation.py <directory> <html_file> --regression <operation_name>'
+
 
 def load_metadata(metadata_file):
     """
@@ -70,7 +72,6 @@ def erase_file_contents(filename):
 
 def plot_process_data(scenarios, stats_data, output_file):
     figures = []
-
     all_calls = stats_data[scenarios[0]].keys()
 
     for c in all_calls:
@@ -103,14 +104,13 @@ def plot_process_data(scenarios, stats_data, output_file):
             f.write('<div style="height: 50px;"></div>')
 
 
-def analyze_response_time(output_file, metadata, stats_data, scenarios):
+def analyze_response_time(output_file, metadata, stats_data, scenarios, operation_name):
     contract_def_list = []
     response_time_list = []
 
     for s in scenarios:
         contract_def = metadata[s][ADDITIONAL_CONTRACT_DEFINITIONS_OEM]
-        response_time = stats_data[s].get(OEM_QUERY_CATALOGUE)
-
+        response_time = stats_data[s].get(operation_name)
         contract_def_list.append(float(contract_def))
         response_time_list.append(float(response_time))
 
@@ -123,7 +123,7 @@ def analyze_response_time(output_file, metadata, stats_data, scenarios):
     model = LinearRegression()
     model.fit(x, y)
 
-    html_content = f"<p>Query Catalogue Resp Time(OEM)\n</p>\n"
+    html_content = f"<p>Analyzing Resp Time(OEM)\n</p>\n"
     html_content += f"<p>Intercept: {model.intercept_}</p>\n"
     html_content += f"<p>Slope (Beta param): {model.coef_[0]}</p>\n"
 
@@ -161,7 +161,7 @@ def analyze_response_time(output_file, metadata, stats_data, scenarios):
         f.write(fig.to_html(full_html=False, include_plotlyjs='cdn'))
 
 
-def process_folders(root_folder, output_file):
+def process_folders(root_folder, output_file, operation_name):
     """
     Process folders inside the root folder to get metadata and statistics files.
     """
@@ -172,31 +172,51 @@ def process_folders(root_folder, output_file):
     for ex_folder in os.listdir(root_folder):
         ex_path = os.path.join(root_folder, ex_folder)
         if os.path.isdir(ex_path):
-            metadata_file = os.path.join(ex_path, 'metadata.txt')
-            dashboard_folder = os.path.join(ex_path, 'dashboard')
-            stats_file = os.path.join(dashboard_folder, 'statistics.json')
-
-            if os.path.exists(metadata_file) and os.path.exists(stats_file):
-                metadata[ex_folder] = load_metadata(metadata_file)
-                stats_data[ex_folder] = (load_stats(stats_file))
-                scenarios.append(ex_folder)
+            ex_contents = os.listdir(ex_path)
+            if os.path.isdir(ex_path):
+                for item in ex_contents:
+                    output_path = os.path.join(ex_path, item)
+                    if os.path.isdir(output_path):
+                        metadata_file = os.path.join(output_path, 'metadata.txt')
+                        dashboard_folder = os.path.join(output_path, 'dashboard')
+                        stats_file = os.path.join(dashboard_folder, 'statistics.json')
+                        if os.path.exists(metadata_file) and os.path.exists(stats_file):
+                            scenario = ex_folder.split('.')[0] if '.' in ex_folder else ex_folder
+                            scenarios.append(scenario)
+                            metadata[scenario] = load_metadata(metadata_file)
+                            stats_data[scenario] = (load_stats(stats_file))
 
     sorted_scenarios = sort_processes(scenarios, metadata)
     plot_process_data(sorted_scenarios, stats_data, output_file)
-    analyze_response_time(output_file, metadata, stats_data, scenarios)
+    analyze_response_time(output_file, metadata, stats_data, scenarios, operation_name)
 
 
-def main(root_folder=None, output_file=None):
-    if root_folder is None:
-        root_folder = '.'
-
-    if output_file is None or not output_file.endswith('.html'):
-        output_file = DEFAULT_OUTPUT_FILE
-
-    process_folders(root_folder, output_file)
+def main(root_folder, output_file, operation_name):
+    process_folders(root_folder, output_file, operation_name)
 
 
 if __name__ == "__main__":
-    root_folder = sys.argv[1] if len(sys.argv) > 1 else None
-    output_file = sys.argv[2] if len(sys.argv) > 2 else None
-    main(root_folder, output_file)
+    parser = argparse.ArgumentParser(description='Test Result Aggregation Script')
+    parser.add_argument('arguments',
+                        nargs=2,
+                        metavar=('directory', 'html_file'),
+                        help='Directory and HTML file arguments.')
+    parser.add_argument('--regression',
+                        type=str,
+                        help='operation name for regression analysis')
+
+    try:
+        args = parser.parse_args()
+    except TypeError as e:
+        print("Error: Test directory or output file name is missing")
+        print(USAGE_MESSAGE)
+        sys.exit(1)
+
+    if not args.regression:
+        print("Error: The --regression argument is required.")
+        print(USAGE_MESSAGE)
+        sys.exit(1)
+
+    directory, html_file = args.arguments
+    operation_name = args.regression
+    main(directory, html_file, operation_name)
