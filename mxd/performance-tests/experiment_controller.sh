@@ -96,7 +96,6 @@ setup_test_environment() {
 
   print_info_log "Deploy Prometheus"
   kubectl apply -f prometheus --context="${test_environment_context}" \
-    | print_debug_log \
     || print_error_log_and_exit "Failed to deploy Prometheus"
 
   print_info_log "Apply terraform"

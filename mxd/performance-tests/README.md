@@ -83,20 +83,22 @@ In order to test this section as realistically as possible, the process is carri
 | OEM_CARS_INITIAL                     |  Number of inital produced cars in the "SetUp" process for creating mockup data in the database for further processes |
 | PARTS_PER_CAR                     | Number of part twins requested by the OEM from the supplier during the production of a car.   |
 | CARS_PRODUCED_PER_INTERVALL                     | Number of cars produced by the OEM during a time interval per plant.   |
+| ADDITIONAL_CONTRACT_DEFINITIONS_OEM                     | Number of additional contract definitions added at the setup stage.   |
 
 #### Supplier Parameters
 
-| Property                        | Explanation|
-|------------------------------|------------------------------|
-| SUPPLIER_ID                 | Unique identifier of the Supplier (Business Partner Number)  |
-| SUPPLIER_MANAGEMENT_URL                    | URL referencing the Management API of the Supplier EDC.   |
-| SUPPLIER_PROTOCOL_URL                     | URL referencing the Dataspace Protocol of the Supplier Connector.    |
-| SUPPLIER_API_KEY                     |  Specific, secret key to access the Management API of the Supplier EDC.  |
-| SUPPLIER_PLANTS                     |  Number of supplier plants manufacturing parts. Each plant is modeled as individual thread. |
-| PARTS_PRODUCED_PER_INTERVALL                     |  Number of cars produced by the OEM during a time interval per plant.  |
-| SUPPLIER_FLEET_MANAGERS                     |  Number of employees requesting car twins.  |
-| CARS_REQUESTED_PER_INTERVALL                     |  Number of car twins requested by the supplier per time interval per employee.  |
+| Property                        | Explanation                                                                                                           |
+|------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| SUPPLIER_ID                 | Unique identifier of the Supplier (Business Partner Number)                                                           |
+| SUPPLIER_MANAGEMENT_URL                    | URL referencing the Management API of the Supplier EDC.                                                               |
+| SUPPLIER_PROTOCOL_URL                     | URL referencing the Dataspace Protocol of the Supplier Connector.                                                     |
+| SUPPLIER_API_KEY                     | Specific, secret key to access the Management API of the Supplier EDC.                                                |
+| SUPPLIER_PLANTS                     | Number of supplier plants manufacturing parts. Each plant is modeled as individual thread.                            |
+| PARTS_PRODUCED_PER_INTERVALL                     | Number of cars produced by the OEM during a time interval per plant.                                                  |
+| SUPPLIER_FLEET_MANAGERS                     | Number of employees requesting car twins.                                                                             |
+| CARS_REQUESTED_PER_INTERVALL                     | Number of car twins requested by the supplier per time interval per employee.                                         |
 | SUPPLIER_PARTS_INITIAL                    | Number of inital produced parts in the "SetUp" process for creating mockup data in the database for further processes |
+| ADDITIONAL_CONTRACT_DEFINITIONS_SUPPLIER                    | Number of additional contract definitions added at the setup stage.                                                   |
 
 ### Functional structure in dependency to the parameter
 
@@ -127,8 +129,7 @@ The setup of the dataspace is explained further in [MXD Setup Wiki](https://gith
 - Add the JMETER_HOME environment variable and let it reference the /bin directory of JMeter.
 
 ### Setup Cluster
-1. Install Docker and authenticate with ```docker login```
-2. Install kind and run ```kind```
+1. Install kind and run ```kind```
 
 #### Local run
 Install kind and run ```kind create cluster -n mxd```, this will create a local cluster named ```kind-mxd```
