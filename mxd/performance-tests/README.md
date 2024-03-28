@@ -178,7 +178,7 @@ For more information about arguments visit [help.txt](help.txt).
 3. Replace <test-result-folder> with the path to the folder containing your test results
 
    The expected folder structure for the <test-result-folder> is as follows:
-    - Test result folder
+    - Test collection result folder
       - Experiment 1
         - output_folder 
           - metadata file
