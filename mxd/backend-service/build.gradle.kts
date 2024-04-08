@@ -65,7 +65,15 @@ dependencies {
     implementation(libs.edc.transform)
     implementation(libs.edc.transaction)
 
-
+    // https://mvnrepository.com/artifact/org.testng/testng
+    testImplementation("org.testng:testng:7.9.0")
+    testImplementation(libs.edc.sql.core)
+    // https://mvnrepository.com/artifact/org.testcontainers/testcontainers
+    testImplementation("org.testcontainers:testcontainers:1.19.7")
+// https://mvnrepository.com/artifact/org.testcontainers/postgresql
+    testImplementation("org.testcontainers:postgresql:1.19.7")
+// https://mvnrepository.com/artifact/org.eclipse.edc/sql-pool-apache-commons
+    implementation("org.eclipse.edc:sql-pool-apache-commons:0.5.1")
 }
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     mergeServiceFiles()
