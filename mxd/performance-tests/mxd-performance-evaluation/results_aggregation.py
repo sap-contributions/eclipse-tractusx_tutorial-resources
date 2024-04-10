@@ -172,23 +172,19 @@ def process_folders(root_folder, output_file, operation_name):
     for ex_folder in os.listdir(root_folder):
         ex_path = os.path.join(root_folder, ex_folder)
         if os.path.isdir(ex_path):
-            ex_contents = os.listdir(ex_path)
-            if os.path.isdir(ex_path):
-                for item in ex_contents:
-                    output_path = os.path.join(ex_path, item)
-                    if os.path.isdir(output_path):
-                        metadata_file = os.path.join(output_path, 'metadata.txt')
-                        dashboard_folder = os.path.join(output_path, 'dashboard')
-                        stats_file = os.path.join(dashboard_folder, 'statistics.json')
-                        if os.path.exists(metadata_file) and os.path.exists(stats_file):
-                            scenario = ex_folder.split('.')[0] if '.' in ex_folder else ex_folder
-                            scenarios.append(scenario)
-                            metadata[scenario] = load_metadata(metadata_file)
-                            stats_data[scenario] = (load_stats(stats_file))
+            metadata_file = os.path.join(ex_path, 'metadata.txt')
+            dashboard_folder = os.path.join(ex_path, 'dashboard')
+            stats_file = os.path.join(dashboard_folder, 'statistics.json')
+            if os.path.exists(metadata_file) and os.path.exists(stats_file):
+                scenario = ex_folder.split('.')[0] if '.' in ex_folder else ex_folder
+                scenarios.append(scenario)
+                metadata[scenario] = load_metadata(metadata_file)
+                stats_data[scenario] = (load_stats(stats_file))
 
     sorted_scenarios = sort_processes(scenarios, metadata)
     plot_process_data(sorted_scenarios, stats_data, output_file)
-    analyze_response_time(output_file, metadata, stats_data, scenarios, operation_name)
+    if operation_name:
+        analyze_response_time(output_file, metadata, stats_data, scenarios, operation_name)
 
 
 def main(root_folder, output_file, operation_name):
@@ -209,11 +205,6 @@ if __name__ == "__main__":
         args = parser.parse_args()
     except TypeError as e:
         print("Error: Test directory or output file name is missing")
-        print(USAGE_MESSAGE)
-        sys.exit(1)
-
-    if not args.regression:
-        print("Error: The --regression argument is required.")
         print(USAGE_MESSAGE)
         sys.exit(1)
 
