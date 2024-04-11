@@ -91,7 +91,7 @@ def plot_process_data(scenarios, stats_data, output_file):
         layout = go.Layout(
             title=c,
             xaxis=dict(title=c),
-            yaxis=dict(title='Median Response Time(ms)')
+            yaxis=dict(title='Median Response Time(ms)', range=[0, None])
         )
         fig = go.Figure(data=[trace], layout=layout)
         figures.append(fig)
