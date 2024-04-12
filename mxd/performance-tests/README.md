@@ -175,19 +175,23 @@ For more information about arguments visit [help.txt](help.txt).
 ### Visualizing Aggregated Test Results
 1. Install python (this script was tested with python version: 3.8.10)
 2. Run the [result aggregation](mxd-performance-evaluation/results_aggregation.py) script to visualize the result with the following command.
+   ```python3 results_aggregation.py <test-result-folder> <output.html>```
+3. To visualize aggregated result with regression analysis, use the following command:
    ```python3 results_aggregation.py <test-result-folder> <output.html> --regression <operation_name>```
-3. Replace <test-result-folder> with the path to the folder containing your test results
+4. Replace <test-result-folder> with the path to the folder containing your test results
 
    The expected folder structure for the <test-result-folder> is as follows:
     - Test collection result folder
       - Experiment 1
-        - output_folder 
           - metadata file
           - dashboard folder
               - statistics file
-      - Experiment 2...
-4. Replace <output.html> with the desired name for the output HTML file.
-5. Replace <operation_name> with desired operation name, e.g- 'OEM Query Catalog'
+      - Experiment 2
+          - metadata file
+          - dashboard folder
+              - statistics file
+5. Replace <output.html> with the desired name for the output HTML file.
+6. Replace <operation_name> with desired operation name, e.g- 'OEM Query Catalog'
 
 #### Example
 ```python3 results_aggregation.py test-result output.html --regression 'OEM Query Catalog'```
