@@ -84,9 +84,6 @@ public class TransferResponse {
         private Date createdDate;
         private Date updatedDate;
 
-        private Builder() {
-        }
-
         public Builder asset(String asset) {
             this.asset = asset;
             return this;

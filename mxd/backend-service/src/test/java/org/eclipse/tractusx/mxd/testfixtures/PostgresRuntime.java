@@ -1,4 +1,3 @@
-package org.eclipse.tractusx.mxd.util;
 /*******************************************************************************
  *
  * Copyright (c) 2024 Contributors to the Eclipse Foundation
@@ -20,20 +19,28 @@ package org.eclipse.tractusx.mxd.util;
  *
  ******************************************************************************/
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.edc.spi.persistence.EdcPersistenceException;
+package org.eclipse.tractusx.mxd.testfixtures;
 
-public class Converter {
+import org.eclipse.edc.junit.extensions.EdcRuntimeExtension;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-    public static String toJson(Object object, ObjectMapper objectMapper) {
-        if (object == null) {
-            return null;
-        }
-        try {
-            return object instanceof String ? object.toString() : objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new EdcPersistenceException(e);
-        }
-    }
+import java.util.Map;
+
+public interface PostgresRuntime {
+
+    @RegisterExtension
+    static final BeforeAllCallback CREATE_DATABASE = context -> PostgresqlEndToEndInstance.createDatabase("runtime");
+
+    @RegisterExtension
+    public static final EdcRuntimeExtension RUNTIME = new EdcRuntimeExtension(
+            "",
+            "backend",
+            Map.of(
+                    "edc.datasource.default.url", PostgresqlEndToEndInstance.JDBC_URL_PREFIX + "runtime",
+                    "edc.datasource.default.user", PostgresqlEndToEndInstance.USER,
+                    "edc.datasource.default.password", PostgresqlEndToEndInstance.PASSWORD
+            )
+    );
+
 }

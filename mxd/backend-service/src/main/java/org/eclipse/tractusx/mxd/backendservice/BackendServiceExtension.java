@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -23,11 +23,12 @@ package org.eclipse.tractusx.mxd.backendservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.failsafe.RetryPolicy;
-import okhttp3.EventListener;
 import okhttp3.OkHttpClient;
+import okhttp3.EventListener;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.eclipse.edc.connector.core.base.EdcHttpClientImpl;
+import org.eclipse.edc.connector.core.base.OkHttpClientConfiguration;
 import org.eclipse.edc.connector.core.base.OkHttpClientFactory;
+import org.eclipse.edc.connector.core.base.RetryPolicyConfiguration;
 import org.eclipse.edc.connector.core.base.RetryPolicyFactory;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
@@ -43,6 +44,7 @@ import org.eclipse.edc.transaction.datasource.spi.DataSourceRegistry;
 import org.eclipse.edc.transaction.spi.TransactionContext;
 import org.eclipse.edc.transform.spi.TypeTransformerRegistry;
 import org.eclipse.edc.web.spi.WebService;
+import org.eclipse.http.client.EdcHttpClientImpl;
 import org.eclipse.tractusx.mxd.backendservice.controller.ContentApiController;
 import org.eclipse.tractusx.mxd.backendservice.controller.TransferApiController;
 import org.eclipse.tractusx.mxd.backendservice.service.*;
@@ -53,6 +55,7 @@ import org.eclipse.tractusx.mxd.backendservice.statements.TransferStatementsServ
 import org.eclipse.tractusx.mxd.backendservice.store.ContentStoreService;
 import org.eclipse.tractusx.mxd.backendservice.store.SqlContentStoreServiceImpl;
 import org.eclipse.tractusx.mxd.backendservice.store.SqlTransferStoreServiceImpl;
+import org.eclipse.tractusx.mxd.backendservice.store.TransferStoreService;
 import org.eclipse.tractusx.mxd.util.Constants;
 
 import javax.sql.DataSource;
@@ -63,8 +66,8 @@ import java.sql.Connection;
 @Extension(BackendServiceExtension.NAME)
 public class BackendServiceExtension implements ServiceExtension {
 
-
     public static final String NAME = "Backend Services";
+
     @Inject(required = false)
     private EventListener okHttpEventListener;
 
@@ -73,10 +76,13 @@ public class BackendServiceExtension implements ServiceExtension {
 
     @Inject
     private DataSourceRegistry dataSourceRegistry;
+
     @Inject
     private TransactionContext transactionContext;
+
     @Inject
     private TypeManager typeManager;
+
     @Inject(required = false)
     private ContentStatementsService statements;
 
@@ -85,36 +91,9 @@ public class BackendServiceExtension implements ServiceExtension {
 
     @Inject
     private TypeTransformerRegistry transformerRegistry;
+
     @Inject
     private QueryExecutor queryExecutor;
-
-    public DataSource createLocalDataSource(ServiceExtensionContext context) {
-        BasicDataSource dataSource = new BasicDataSource();
-        System.out.println(context.getConfig().getEntries());
-        var url = context.getConfig().getString(Constants.DATABASE_URL);
-        var userName = context.getConfig().getString(Constants.DATABASE_USER);
-        var password = context.getConfig().getString(Constants.DATABASE_PASSWORD);
-
-        try {
-            dataSource.setDriverClassName(Constants.DEFAULT_DRIVE);
-            dataSource.setUrl(url);
-            dataSource.setUsername(userName);
-            dataSource.setPassword(password);
-            Connection connections = dataSource.getConnection();
-            InputStream inputStream = BackendServiceExtension.class.getClassLoader().getResourceAsStream(Constants.SCHEMA_PATH);
-            if (inputStream != null) {
-                String schema = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-                runQuery(schema, connections);
-                context.getMonitor().info(String.valueOf(connections));
-            } else {
-                context.getMonitor().info("schema.sql File not found on the classpath.");
-            }
-            return dataSource;
-        } catch (Exception e) {
-            context.getMonitor().severe(e.getMessage());
-        }
-        return dataSource;
-    }
 
     @Override
     public String name() {
@@ -125,30 +104,85 @@ public class BackendServiceExtension implements ServiceExtension {
     public void initialize(ServiceExtensionContext context) {
         try {
             registerDefaultDataSource(context);
+
+            Monitor monitor = context.getMonitor();
+            String dataSourceName = getDataSourceName(context);
+            EdcHttpClient edcHttpClient = createEdcHttpClient(context);
+
+            // Initialize SQL content store
             var sqlContentStore = new SqlContentStoreServiceImpl(
                     dataSourceRegistry,
-                    getDataSourceName(context),
+                    dataSourceName,
                     transactionContext,
                     typeManager.getMapper(),
                     queryExecutor,
                     getStatementImpl(),
-                    context.getMonitor());
+                    monitor);
+            //register content service
+            context.registerService(ContentStoreService.class, sqlContentStore);
+            ContentService contentService = new ContentServiceImpl(sqlContentStore, monitor);
+            context.registerService(ContentService.class, contentService);
+            webService.registerResource(
+                    new ContentApiController(
+                            contentService,
+                            monitor,
+                            getObjectMapper()
+                    ));
+
+            // Initialize SQL transfer store
             var sqlTransferStore = new SqlTransferStoreServiceImpl(
                     dataSourceRegistry,
-                    getDataSourceName(context),
+                    dataSourceName,
                     transactionContext,
                     typeManager.getMapper(),
                     queryExecutor,
                     getTransferStatementImpl(),
-                    context.getMonitor());
-            context.registerService(ContentStoreService.class, sqlContentStore);
-            ContentService contentService = new ContentServiceImpl(sqlContentStore, context.getMonitor());
-            context.registerService(ContentService.class, contentService);
-            webService.registerResource(new ContentApiController(contentService, context.getMonitor(), getObjectMapper()));
-            //register transfer controller and dependencies services here
-            TransferService transferService = new TransferServiceImpl(sqlTransferStore, edcHttpClient(context), context.getMonitor(), getHttConnectionService(edcHttpClient(context), context.getMonitor()));
+                    monitor);
+
+            //register transfer service
+            context.registerService(TransferStoreService.class, sqlTransferStore);
+            TransferService transferService = new TransferServiceImpl(
+                    sqlTransferStore,
+                    edcHttpClient,
+                    monitor,
+                    getHttConnectionService(edcHttpClient, monitor));
             context.registerService(TransferService.class, transferService);
-            webService.registerResource(new TransferApiController(transferService,context.getMonitor(),getObjectMapper()));
+            webService.registerResource(
+                    new TransferApiController(
+                            transferService,
+                            monitor,
+                            getObjectMapper()
+                    ));
+        } catch (Exception e) {
+            context.getMonitor().severe(e.getMessage());
+            throw new EdcException(e.getMessage());
+        }
+    }
+
+    public DataSource createLocalDataSource(ServiceExtensionContext context) {
+        BasicDataSource dataSource = new BasicDataSource();
+
+        var url = context.getConfig().getString(Constants.DATABASE_URL);
+        var userName = context.getConfig().getString(Constants.DATABASE_USER);
+        var password = context.getConfig().getString(Constants.DATABASE_PASSWORD);
+
+        try {
+            dataSource.setDriverClassName(Constants.DEFAULT_DRIVE);
+            dataSource.setUrl(url);
+            dataSource.setUsername(userName);
+            dataSource.setPassword(password);
+            Connection connections = dataSource.getConnection();
+            InputStream inputStream = BackendServiceExtension.class
+                    .getClassLoader()
+                    .getResourceAsStream(Constants.SCHEMA_PATH);
+            if (inputStream != null) {
+                String schema = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+                runQuery(schema, connections);
+                context.getMonitor().info(String.valueOf(connections));
+            } else {
+                context.getMonitor().info("schema.sql File not found on the classpath.");
+            }
+            return dataSource;
         } catch (Exception e) {
             context.getMonitor().severe(e.getMessage());
             throw new EdcException(e.getMessage());
@@ -156,7 +190,8 @@ public class BackendServiceExtension implements ServiceExtension {
     }
 
     private String getDataSourceName(ServiceExtensionContext context) {
-        return context.getConfig().getString(Constants.DATASOURCE_NAME_SETTING, DataSourceRegistry.DEFAULT_DATASOURCE);
+        return context.getConfig().getString(Constants.DATASOURCE_NAME_SETTING,
+                DataSourceRegistry.DEFAULT_DATASOURCE);
     }
 
     private ContentStatementsService getStatementImpl() {
@@ -165,8 +200,9 @@ public class BackendServiceExtension implements ServiceExtension {
     }
 
     private TransferStatementsService getTransferStatementImpl() {
-        return transferStatementsService != null ? transferStatementsService : new TransferStatementsServiceImpl() {
-        };
+        return transferStatementsService != null ? transferStatementsService :
+                new TransferStatementsServiceImpl() {
+                };
     }
 
     public void registerDefaultDataSource(ServiceExtensionContext context) {
@@ -174,22 +210,29 @@ public class BackendServiceExtension implements ServiceExtension {
     }
 
     @Provider
-    public EdcHttpClient edcHttpClient(ServiceExtensionContext context) {
+    public EdcHttpClient createEdcHttpClient(ServiceExtensionContext context) {
         return new EdcHttpClientImpl(
-                okHttpClient(context),
-                retryPolicy(context),
+                createOkHttpClient(context),
+                createRetryPolicy(context),
                 context.getMonitor()
         );
     }
 
     @Provider
-    public OkHttpClient okHttpClient(ServiceExtensionContext context) {
-        return OkHttpClientFactory.create(context, okHttpEventListener);
+    public OkHttpClient createOkHttpClient(ServiceExtensionContext context) {
+        return OkHttpClientFactory.create(OkHttpClientConfiguration.Builder.newInstance().build(), okHttpEventListener, context.getMonitor());
     }
 
     @Provider
-    public <T> RetryPolicy<T> retryPolicy(ServiceExtensionContext context) {
-        return RetryPolicyFactory.create(context);
+    public <T> RetryPolicy<T> createRetryPolicy(ServiceExtensionContext context) {
+        var configuration = RetryPolicyConfiguration.Builder.newInstance()
+                .logOnAbort(true)
+                .logOnRetryScheduled(true)
+                .logOnRetry(true)
+                .logOnRetriesExceeded(true)
+                .logOnFailedAttempt(true)
+                .build();
+        return (RetryPolicy<T>) RetryPolicyFactory.create(configuration, context.getMonitor());
     }
 
     public int runQuery(String query, Connection connection) {

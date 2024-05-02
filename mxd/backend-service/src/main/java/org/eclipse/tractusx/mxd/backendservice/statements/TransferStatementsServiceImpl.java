@@ -23,6 +23,7 @@ package org.eclipse.tractusx.mxd.backendservice.statements;
 
 import org.eclipse.edc.spi.query.QuerySpec;
 import org.eclipse.edc.sql.translation.SqlQueryStatement;
+import org.eclipse.edc.sql.translation.PostgresqlOperatorTranslator;
 
 import static java.lang.String.format;
 
@@ -71,6 +72,7 @@ public class TransferStatementsServiceImpl implements TransferStatementsService 
     @Override
     public SqlQueryStatement createQuery(QuerySpec querySpec) {
         var select = format("SELECT * FROM %s", getTransferTable());
-        return new SqlQueryStatement(select, querySpec, null);
+        //return new SqlQueryStatement(select, querySpec, null);
+        return new SqlQueryStatement(select, querySpec, null, new PostgresqlOperatorTranslator());
     }
 }

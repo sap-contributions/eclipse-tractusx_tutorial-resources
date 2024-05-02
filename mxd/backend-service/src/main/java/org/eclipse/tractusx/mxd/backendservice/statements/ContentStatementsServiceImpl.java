@@ -23,7 +23,7 @@ package org.eclipse.tractusx.mxd.backendservice.statements;
 
 import org.eclipse.edc.spi.query.QuerySpec;
 import org.eclipse.edc.sql.translation.SqlQueryStatement;
-
+import org.eclipse.edc.sql.translation.PostgresqlOperatorTranslator;
 import static java.lang.String.format;
 
 public class ContentStatementsServiceImpl implements ContentStatementsService {
@@ -70,7 +70,8 @@ public class ContentStatementsServiceImpl implements ContentStatementsService {
     @Override
     public SqlQueryStatement createQuery(QuerySpec querySpec) {
         var select = format("SELECT * FROM %s", getContentTable());
-        return new SqlQueryStatement(select, querySpec, null);
+        //return new SqlQueryStatement(select, querySpec, null);
+        return new SqlQueryStatement(select, querySpec, null, new PostgresqlOperatorTranslator());
     }
 
     protected String getSelectStatement() {

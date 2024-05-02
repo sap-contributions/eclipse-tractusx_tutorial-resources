@@ -66,11 +66,9 @@ public class Content extends Entity {
         private String data;
         private String id;
 
-        // Default constructor
         public Builder() {
         }
 
-        // Setter methods for each field
         public Builder setData(String data) {
             this.data = data;
             return this;
@@ -91,7 +89,6 @@ public class Content extends Entity {
             return this;
         }
 
-        // Build method to create an instance of Content
         public Content build() {
             return new Content(id, data, clock, createdAt);
         }

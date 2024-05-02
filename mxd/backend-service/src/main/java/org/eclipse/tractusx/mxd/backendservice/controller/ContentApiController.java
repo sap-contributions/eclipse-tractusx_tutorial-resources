@@ -52,11 +52,10 @@ public class ContentApiController {
         this.objectMapper = objectMapper;
     }
 
-
     @POST
     public String createContent(Object contentJson, @Context UriInfo uriInfo) {
         var contentID = this.service.create(contentJson);
-        monitor.info(uriInfo.getAbsolutePath() +"/"+ contentID);
+        monitor.info(uriInfo.getAbsolutePath() + "/" + contentID);
         return createJsonResponse(contentID, uriInfo);
     }
 
@@ -68,9 +67,10 @@ public class ContentApiController {
     @GET
     @Path("/{contentId}")
     public String getContentByID(@PathParam("contentId") String contentId) {
+       // var test = service.getContent(contentId);
         return Optional.of(contentId)
                 .map(id -> service.getContent(contentId))
-                .map(content -> content.getContent() != null ? content.getContent().getData() : Converter.toJson(content.getFailure(),objectMapper))
+                .map(content -> content.getContent() != null ? content.getContent().getData() : Converter.toJson(content.getFailure(), objectMapper))
                 .orElse(Constants.DEFAULTERRORMESSAGE);
     }
 
@@ -79,7 +79,6 @@ public class ContentApiController {
     public String getRandomContent() {
         return this.service.getRandomContent();
     }
-
 
     private String createJsonResponse(String id, UriInfo uriInfo) {
         JsonNode jsonResponse = objectMapper.createObjectNode()

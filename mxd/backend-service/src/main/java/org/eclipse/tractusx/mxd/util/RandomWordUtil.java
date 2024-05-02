@@ -22,6 +22,7 @@
 package org.eclipse.tractusx.mxd.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.edc.spi.EdcException;
 
 import java.security.SecureRandom;
 
@@ -36,7 +37,7 @@ public class RandomWordUtil {
             randomData.setText(generateRandomString());
             return objectMapper.writeValueAsString(randomData);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new EdcException(e.getMessage());
         }
     }
 

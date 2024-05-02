@@ -47,17 +47,17 @@ public class TransferApiController {
 
     private final ObjectMapper objectMapper;
 
-    public TransferApiController(TransferService transferService,Monitor monitor,ObjectMapper objectMapper) {
+    public TransferApiController(TransferService transferService, Monitor monitor, ObjectMapper objectMapper) {
         this.transferService = transferService;
         this.monitor = monitor;
-        this.objectMapper=objectMapper;
+        this.objectMapper = objectMapper;
     }
 
     @POST
     @Produces((MediaType.APPLICATION_JSON))
     @Consumes((MediaType.APPLICATION_JSON))
     public TransferRequest insertTransfer(TransferRequest transferRequest) {
-        monitor.info("insertTransfer POST request "+transferRequest);
+        monitor.info("insertTransfer POST request " + transferRequest);
 
         Transfer transfer = new Transfer.Builder()
                 .id(transferRequest.getId())
@@ -66,7 +66,7 @@ public class TransferApiController {
                 .authCode(transferRequest.getAuthCode())
                 .properties(transferRequest.getProperties())
                 .build();
-        var transferResponse = this.transferService.create(transfer,monitor)
+        var transferResponse = this.transferService.create(transfer, monitor)
                 .map(a -> TransferRequest.builder()
                         .id(a.getId())
                         .endpoint(a.getEndpoint())
@@ -88,7 +88,7 @@ public class TransferApiController {
     public String getTransfer(@PathParam("transferId") String transferId) {
         return Optional.of(transferId)
                 .map(id -> transferService.getTransfer(transferId))
-                .map(transfer -> transfer.getContent() != null ? transfer.getContent().getAsset() : Converter.toJson(transfer.getFailure(),objectMapper))
+                .map(transfer -> transfer.getContent() != null ? transfer.getContent().getAsset() : Converter.toJson(transfer.getFailure(), objectMapper))
                 .orElse(Constants.DEFAULTERRORMESSAGE);
     }
 
@@ -97,7 +97,7 @@ public class TransferApiController {
     public Object getTransferContents(@PathParam("id") String transferId) {
         return Optional.of(transferId)
                 .map(id -> transferService.getTransfer(transferId))
-                .map(transfer -> transfer.getContent() != null ? transfer.getContent().getContents() : Converter.toJson(transfer.getFailure(),objectMapper))
+                .map(transfer -> transfer.getContent() != null ? transfer.getContent().getContents() : Converter.toJson(transfer.getFailure(), objectMapper))
                 .orElse(Constants.DEFAULTERRORMESSAGE);
     }
 }

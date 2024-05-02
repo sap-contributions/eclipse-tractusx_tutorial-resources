@@ -1,97 +1,83 @@
 # Tractus-X Backend Service
 
-##  API Details Summary
+## API Details Summary
 
-Backend Service is used to validate the transfer. it has the following end points.
+Backend Service is used to validate the transfer. It has the following APIs.
 
-## 1 Contents API
+- [Contents API](#contents-api)
+- [Transfer API](#transfer-api)
 
-### POST API /api/v1/contents to store an assets. It should return a url / id of this content in the response.
+## Contents API
 
+### Store an Asset
 
- Body:
-
-  {
-        "userId": 1,
-        "id": 1,
-        "title": "delectus aut autem",
-        "completed": false
-  }
-```
-
-which should return something similar to this
+- Method : POST
+- URL : http://localhost/backend-service/api/v1/contents
+- Request Body:
 
 ```json
 {
-  "id":"3b777103-5e06-461b-90c6-1f99e597f60d",
-  "url":"http://localhost:9000/api/v1/contents/3b777103-5e06-461b-90c6-1f99e597f60d"
+  "userId": 1,
+  "id": 1,
+  "title": "delectus aut autem",
+  "completed": false
 }
 ```
 
-### GET API /api/v1/contents/{id} to fetch the content. This URL will be used as a DataAddress in the assets AP
-
-
-
-which should return something similar to this
+- Response
 
 ```json
 {
+  "id": "3b777103-5e06-461b-90c6-1f99e597f60d",
+  "url": "http://localhost:9000/api/v1/contents/3b777103-5e06-461b-90c6-1f99e597f60d"
+}
+```
+
+### Fetch an Asset
+
+- Method : GET
+- URL : http://localhost/backend-service/api/v1/contents/{id}
+- Response
+
+```json
+{
+  "userId": 1,
+  "id": 1,
+  "title": "delectus aut autem",
+  "completed": false
+}
+```
+
+This URL will be used as a DataAddress in the assets API.
+
+### Fetch All Assets
+
+- Method : GET
+- URL : http://localhost/backend-service/api/v1/contents
+- Response
+
+```json
+[
+  {
     "userId": 1,
     "id": 1,
     "title": "delectus aut autem",
     "completed": false
-}
-```
-
-### GET API /api/v1/contents to fetch the All the content. 
-
-
-
-which should return something similar to this
-
-```json
-[
-    {
-        "userId": 1,
-        "id": 1,
-        "title": "delectus aut autem",
-        "completed": false
-    },
-    {
-        "userId": 1,
-        "id": 2,
-        "title": "quis ut nam facilis et officia qui",
-        "completed": false
-    },
-    {
-        "userId": 1,
-        "id": 3,
-        "title": "fugiat veniam minus",
-        "completed": false
-    },
-    {
-        "userId": 1,
-        "id": 4,
-        "title": "et porro tempora",
-        "completed": true
-    },
-    {
-        "userId": 1,
-        "id": 5,
-        "title": "laboriosam mollitia et enim quasi adipisci quia provident illum",
-        "completed": false
-    },
-    {
-        "userId": 1,
-        "id": 6,
-        "title": "qui ullam ratione quibusdam voluptatem quia omnis",
-        "completed": false
-    }
+  },
+  {
+    "userId": 1,
+    "id": 2,
+    "title": "quis ut nam facilis et officia qui",
+    "completed": false
+  }
 ]
 ```
-### GET API /api/v1/contents/random to generate some random contents.
 
-which should return something similar to this
+### Generate a random content
+
+- Method : GET
+- URL : http://localhost/backend-service/api/v1/contents/random
+- Response
 
 ```json
 {
@@ -101,16 +87,13 @@ which should return something similar to this
 }
 ```
 
+## Transfer API
 
-## 2 Transfer API
+### Accept the transfer data from the connector
 
-
-### POST API /api/v1/transfers to accept the transfer data from the connector. Connector will push data similar to this:
-
-```shell
- Body:
-
-  {
+Connector will push something similar to this:
+```json
+{
   "id": "123456789011",
   "endpoint": "http://alice-tractusx-connector-dataplane:8081/api/public",
   "authKey": "Authorization",
@@ -119,7 +102,9 @@ which should return something similar to this
 }
 ```
 
-Persisting above data with transfer id as primary key.
+- Method : POST
+- URL : http://localhost/backend-service/api/v1/transfers
+- Request/ Response
 
 ```json
 {
@@ -131,10 +116,11 @@ Persisting above data with transfer id as primary key.
 }
 ```
 
-### GET API /api/v1/transfers/{id} to return the above json pushed by connector.
+### Get transfer data with ID
 
-
-which should return something similar to this
+- Method : GET
+- URL : http://localhost/backend-service/api/v1/transfers/{id}
+- Response
 
 ```json
 {
@@ -146,33 +132,26 @@ which should return something similar to this
 }
 ```
 
-### GET API /api/v1/transfers/{id}/contents to return the actual assets content (i.e. the data which is stored at the above endpoint http://alice-tractusx-connector-dataplane:8081/api/public)
-
-which should return something similar to this
-
-```json
-  {
-        "userId": 123456789011,
-        "id": 6,
-        "title": "qui ullam ratione quibusdam voluptatem quia omnis",
-        "completed": false
-  }
-```
-### GET API /api/v1/transfers/{id}/contents to return the actual assets content (i.e. the data which is stored at the above endpoint http://alice-tractusx-connector-dataplane:8081/api/public)
-
-which should return something similar to this
+### Get Actual Asset Content
+Get the data which is stored at the above endpoint http://alice-tractusx-connector-dataplane:8081/api/public
+- Method : GET
+- URL : http://localhost/backend-service/api/v1/transfers/{id}/contents
+- Response
 
 ```json
-  {
-        "userId": 123456789011,
-        "id": 6,
-        "title": "qui ullam ratione quibusdam voluptatem quia omnis",
-        "completed": false
-  }
+{
+  "userId": 123456789011,
+  "id": 6,
+  "title": "qui ullam ratione quibusdam voluptatem quia omnis",
+  "completed": false
+}
 ```
+
+
 ## Database Schema
 
 ### following Schema is used for contents
+
 ```shell
 CREATE TABLE IF NOT EXISTS content
 (
@@ -183,7 +162,9 @@ CREATE TABLE IF NOT EXISTS content
     CONSTRAINT content_pkey PRIMARY KEY (id)
 );
 ```
+
 ### following Schema is used for transfer
+
 ```shell
 CREATE TABLE IF NOT EXISTS transfer
 (

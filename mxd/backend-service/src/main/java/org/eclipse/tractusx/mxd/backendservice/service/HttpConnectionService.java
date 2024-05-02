@@ -44,9 +44,9 @@ public class HttpConnectionService {
     public HttpConnectionService() {
     }
 
-    public String getUrlAssets(Transfer receivedModel,Monitor monitor) {
+    public String getUrlAssets(Transfer receivedModel, Monitor monitor) {
         var res = "";
-        monitor.info("getUrlAssets "+receivedModel);
+        monitor.info("getUrlAssets " + receivedModel);
         Request getRequest = new Request.Builder()
                 .url(receivedModel.getEndpoint())
                 .header(receivedModel.getAuthKey(), receivedModel.getAuthCode())
