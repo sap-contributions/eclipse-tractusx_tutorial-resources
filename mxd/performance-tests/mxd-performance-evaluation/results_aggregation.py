@@ -14,7 +14,7 @@ SUPPLIER_FLEET_MANAGERS = 'SUPPLIER_FLEET_MANAGERS'
 ADDITIONAL_CONTRACT_DEFINITIONS_OEM = 'ADDITIONAL_CONTRACT_DEFINITIONS_OEM'
 ADDITIONAL_CONTRACT_DEFINITIONS_SUPPLIER = 'ADDITIONAL_CONTRACT_DEFINITIONS_SUPPLIER'
 DEFAULT_OUTPUT_FILE = 'output.html'
-USAGE_MESSAGE = 'Usage: python3 results_aggregation.py <directory> <html_file> --regression <operation_name>'
+USAGE_MESSAGE = 'Usage: python3 results_aggregation.py <directory> <html_file> --regression <operation_name> --metric <metric_name>'
 
 
 def load_metadata(metadata_file):
@@ -32,7 +32,7 @@ def load_metadata(metadata_file):
     return metadata
 
 
-def load_stats(stat_file):
+def load_stats(stat_file, metric_name):
     """
     Load statistics from a JSON file.
     """
@@ -42,8 +42,11 @@ def load_stats(stat_file):
     processes_data = {}
 
     for process_name, process_data in data.items():
-        median_res_time = process_data['medianResTime']
-        processes_data[process_name] = median_res_time
+        median_val = process_data[metric_name]
+        if not isinstance(median_val, (int, float, complex)):
+            print("Error: Found non-numeric value in passed metric field")
+            sys.exit()
+        processes_data[process_name] = median_val
 
     return processes_data
 
@@ -70,7 +73,7 @@ def erase_file_contents(filename):
             pass
 
 
-def plot_process_data(scenarios, stats_data, output_file):
+def plot_process_data(scenarios, stats_data, output_file, metric_name):
     figures = []
     all_calls = stats_data[scenarios[0]].keys()
 
@@ -91,7 +94,7 @@ def plot_process_data(scenarios, stats_data, output_file):
         layout = go.Layout(
             title=c,
             xaxis=dict(title=c),
-            yaxis=dict(title='Median Response Time(ms)', range=[0, None])
+            yaxis=dict(title=metric_name, range=[0, None])
         )
         fig = go.Figure(data=[trace], layout=layout)
         figures.append(fig)
@@ -161,13 +164,15 @@ def analyze_response_time(output_file, metadata, stats_data, scenarios, operatio
         f.write(fig.to_html(full_html=False, include_plotlyjs='cdn'))
 
 
-def process_folders(root_folder, output_file, operation_name):
+def process_folders(root_folder, output_file, operation_name, metric_name):
     """
     Process folders inside the root folder to get metadata and statistics files.
     """
     scenarios = []
     stats_data = {}
     metadata = {}
+    if not metric_name:
+        metric_name = "medianResTime"
 
     for ex_folder in os.listdir(root_folder):
         ex_path = os.path.join(root_folder, ex_folder)
@@ -179,16 +184,16 @@ def process_folders(root_folder, output_file, operation_name):
                 scenario = ex_folder.split('.')[0] if '.' in ex_folder else ex_folder
                 scenarios.append(scenario)
                 metadata[scenario] = load_metadata(metadata_file)
-                stats_data[scenario] = (load_stats(stats_file))
+                stats_data[scenario] = load_stats(stats_file, metric_name)
 
     sorted_scenarios = sort_processes(scenarios, metadata)
-    plot_process_data(sorted_scenarios, stats_data, output_file)
+    plot_process_data(sorted_scenarios, stats_data, output_file, metric_name)
     if operation_name:
         analyze_response_time(output_file, metadata, stats_data, scenarios, operation_name)
 
 
 def main(root_folder, output_file, operation_name):
-    process_folders(root_folder, output_file, operation_name)
+    process_folders(root_folder, output_file, operation_name, metric_name)
 
 
 if __name__ == "__main__":
@@ -201,6 +206,10 @@ if __name__ == "__main__":
                         type=str,
                         help='operation name for regression analysis')
 
+    parser.add_argument('--metric',
+                        type=str,
+                        help='metric name')
+
     try:
         args = parser.parse_args()
     except TypeError as e:
@@ -210,4 +219,5 @@ if __name__ == "__main__":
 
     directory, html_file = args.arguments
     operation_name = args.regression
+    metric_name = args.metric
     main(directory, html_file, operation_name)
