@@ -42,11 +42,11 @@ def load_stats(stat_file, metric_name):
     processes_data = {}
 
     for process_name, process_data in data.items():
-        median_val = process_data[metric_name]
-        if not isinstance(median_val, (int, float, complex)):
+        metric_val = process_data[metric_name]
+        if not isinstance(metric_val, (int, float, complex)):
             print("Error: Found non-numeric value in passed metric field")
             sys.exit()
-        processes_data[process_name] = median_val
+        processes_data[process_name] = metric_val
 
     return processes_data
 
