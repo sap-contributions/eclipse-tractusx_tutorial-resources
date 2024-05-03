@@ -1,25 +1,18 @@
-/*******************************************************************************
+/********************************************************************************
+ *  Copyright (c) 2024 SAP SE
  *
- * Copyright (c) 2024 Contributors to the Eclipse Foundation
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Apache License, Version 2.0 which is available at
+ *  https://www.apache.org/licenses/LICENSE-2.0
  *
- * See the NOTICE file(s) distributed with this work for additional
- * information regarding copyright ownership.
+ *  SPDX-License-Identifier: Apache-2.0
  *
- * This program and the accompanying materials are made available under the
- * terms of the Apache License, Version 2.0 which is available at
- * https://www.apache.org/licenses/LICENSE-2.0
+ *  Contributors:
+ *       SAP SE - initial implementation
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- ******************************************************************************/
+ ********************************************************************************/
 
-package org.eclipse.tractusx.mxd.test;
+package org.eclipse.tractusx.mxd.e2e;
 
 import io.restassured.http.ContentType;
 import jakarta.json.JsonObject;
@@ -31,7 +24,6 @@ import org.eclipse.tractusx.mxd.testfixtures.PostgresRuntime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.time.Clock;
 import java.util.UUID;
 
 import static io.restassured.http.ContentType.JSON;
@@ -135,17 +127,17 @@ public class ContentApiEndToEndTest {
             return createObjectBuilder()
                     .add("id", id)
                     .add("data", getContentData())
-                    .add("clock", String.valueOf(Clock.systemUTC()))
                     .add("createdAt", System.currentTimeMillis())
                     .build();
 
         }
 
         private Content getContent(String id) {
-            return new Content(id,
-                    getContentData(),
-                    Clock.systemUTC(),
-                    System.currentTimeMillis());
+            return Content.Builder
+                    .newInstance()
+                    .id(id)
+                    .data(getContentData())
+                    .build();
         }
 
         private String getContentData() {

@@ -1,26 +1,18 @@
-/*******************************************************************************
+/********************************************************************************
+ *  Copyright (c) 2024 SAP SE
  *
- * Copyright (c) 2024 Contributors to the Eclipse Foundation
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Apache License, Version 2.0 which is available at
+ *  https://www.apache.org/licenses/LICENSE-2.0
  *
- * See the NOTICE file(s) distributed with this work for additional
- * information regarding copyright ownership.
+ *  SPDX-License-Identifier: Apache-2.0
  *
- * This program and the accompanying materials are made available under the
- * terms of the Apache License, Version 2.0 which is available at
- * https://www.apache.org/licenses/LICENSE-2.0
+ *  Contributors:
+ *       SAP SE - initial implementation
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- ******************************************************************************/
+ ********************************************************************************/
 
 package org.eclipse.tractusx.mxd.backendservice.controller;
-
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.*;
@@ -59,7 +51,7 @@ public class TransferApiController {
     public TransferRequest insertTransfer(TransferRequest transferRequest) {
         monitor.info("insertTransfer POST request " + transferRequest);
 
-        Transfer transfer = new Transfer.Builder()
+        Transfer transfer = Transfer.Builder.newInstance()
                 .id(transferRequest.getId())
                 .endpoint(transferRequest.getEndpoint())
                 .authKey(transferRequest.getAuthKey())
