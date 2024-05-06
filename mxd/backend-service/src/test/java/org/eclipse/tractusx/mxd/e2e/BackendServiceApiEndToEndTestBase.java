@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Contributors:
- *       SAP SE - initial implementation
+ *       SAP SE - initial API and implementation
  *
  ********************************************************************************/
 
@@ -31,15 +31,21 @@ public abstract class BackendServiceApiEndToEndTestBase {
     }
 
     protected RequestSpecification baseRequest() {
+        URI uri = getBaseUri();
+
+        return given()
+                .baseUri(uri.toString())
+                .when();
+    }
+
+    public URI getBaseUri() {
         Map configs = runtime.getContext().getConfig().getEntries();
         String port = configs.get("web.http.port").toString();
         String host = configs.get("edc.hostname").toString();
         String path = configs.get("web.http.path").toString();
         URI uri = URI.create("http://" + host + ":" + port + path);
 
-        return given()
-                .baseUri(uri.toString())
-                .when();
+        return uri;
     }
 
 }

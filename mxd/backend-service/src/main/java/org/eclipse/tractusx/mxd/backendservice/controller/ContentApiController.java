@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Contributors:
- *       SAP SE - initial implementation
+ *       SAP SE - initial API and implementation
  *
  ********************************************************************************/
 
@@ -61,7 +61,6 @@ public class ContentApiController {
     @GET
     @Path("/{contentId}")
     public String getContentByID(@PathParam("contentId") String contentId) {
-        // var test = service.getContent(contentId);
         return Optional.of(contentId)
                 .map(id -> service.getContent(contentId))
                 .map(content -> content.getContent() != null ? content.getContent().getData() : Converter.toJson(content.getFailure(), objectMapper))

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Contributors:
- *       SAP SE - initial implementation
+ *       SAP SE - initial API and implementation
  *
  ********************************************************************************/
 
@@ -18,19 +18,18 @@ import io.restassured.http.ContentType;
 import jakarta.json.JsonObject;
 import org.eclipse.edc.junit.annotations.PostgresqlIntegrationTest;
 import org.eclipse.edc.junit.extensions.EdcRuntimeExtension;
-import org.eclipse.tractusx.mxd.backendservice.entity.Content;
 import org.eclipse.tractusx.mxd.backendservice.store.ContentStoreService;
 import org.eclipse.tractusx.mxd.testfixtures.PostgresRuntime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import static io.restassured.http.ContentType.JSON;
 import static jakarta.json.Json.createObjectBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class ContentApiEndToEndTest {
 
@@ -52,30 +51,24 @@ public class ContentApiEndToEndTest {
 
         @Test
         void getContentById() {
-            String id = UUID.randomUUID().toString();
-            Content content = getContent(id);
-            ContentStoreService storeService = getContentIndex();
-
-            String storeResultId = storeService.save(content);
+            LinkedHashMap content = getContent();
+            String contentId = getContentIndex().save(content);
 
             baseRequest()
                     .when()
-                    .get(ENDPOINT + storeResultId)
+                    .get(ENDPOINT + contentId)
                     .then()
                     .log().ifValidationFails()
                     .statusCode(200)
-                    .contentType(JSON)
-                    .body("id", is(id))
-                    .body("data", is(getContentData()));
+                    .body("userId", is(content.get("userId")))
+                    .body("title", is(content.get("title")))
+                    .body("text", is(content.get("text")));
         }
 
         @Test
         void getAllContents() {
-            String id = UUID.randomUUID().toString();
-            Content content = getContent(id);
-            ContentStoreService storeService = getContentIndex();
-
-            storeService.save(content);
+            LinkedHashMap content = getContent();
+            getContentIndex().save(content);
 
             baseRequest()
                     .when()
@@ -89,62 +82,73 @@ public class ContentApiEndToEndTest {
 
         @Test
         void createAsset_shouldBeStored() {
-            String id = UUID.randomUUID().toString();
-            JsonObject contentJson = getContentJson(id);
+            JsonObject contentJson = getContentJson();
 
-            String contentId = baseRequest()
+            var responseBody = baseRequest()
                     .contentType(ContentType.JSON)
                     .body(contentJson)
                     .post(ENDPOINT)
                     .then()
                     .log().ifError()
-                    .statusCode(200)
-                    .extract().jsonPath()
+                    .statusCode(200);
+
+            String contentId = responseBody.extract().jsonPath()
                     .getString("id");
+            String contentUrl = responseBody.extract().jsonPath()
+                    .getString("url");
 
             assertThat(getContentIndex().findById(contentId)).isNotNull();
+
+            baseRequest()
+                    .when()
+                    .get(contentUrl)
+                    .then()
+                    .log().ifValidationFails()
+                    .statusCode(200)
+                    .contentType(JSON)
+                    .body("userId", is(contentJson.getString("userId")))
+                    .body("title", is(contentJson.getString("title")))
+                    .body("text", is(contentJson.getString("text")));
         }
 
         @Test
         void getRandomContent() {
-            var body = baseRequest()
+            baseRequest()
                     .when()
                     .get(ENDPOINT + "random")
                     .then()
                     .log().ifValidationFails()
                     .statusCode(200)
                     .contentType(JSON)
-                    .body("userId", is(greaterThan(-1)));
+                    .body("userId", is(greaterThan(-1)))
+                    .body("title",  not(emptyString()))
+                    .body("text",  not(emptyString()));
 
-            assertThat(body).isNotNull();
         }
 
         private ContentStoreService getContentIndex() {
             return runtime.getContext().getService(ContentStoreService.class);
         }
 
-        public JsonObject getContentJson(String id) {
+        private LinkedHashMap getContent() {
+            String id = UUID.randomUUID().toString();
+            LinkedHashMap<String, String> content
+                    = new LinkedHashMap<>();
+            content.put("userId", id);
+            content.put("title", "Test");
+            content.put("text", "Test");
+
+            return  content;
+        }
+
+        public JsonObject getContentJson() {
+            String id = UUID.randomUUID().toString();
             return createObjectBuilder()
-                    .add("id", id)
-                    .add("data", getContentData())
-                    .add("createdAt", System.currentTimeMillis())
+                    .add("userId", id)
+                    .add("title", "Test")
+                    .add("text", "Test")
                     .build();
 
-        }
-
-        private Content getContent(String id) {
-            return Content.Builder
-                    .newInstance()
-                    .id(id)
-                    .data(getContentData())
-                    .build();
-        }
-
-        private String getContentData() {
-            return "\"userId\": 1, " +
-                    "\"id\": 1, " +
-                    "\"title\": \"delectus aut autem\", " +
-                    "\"completed\": false";
         }
     }
 }

@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Contributors:
- *       SAP SE - initial implementation
+ *       SAP SE - initial API and implementation
  *
  ********************************************************************************/
 
@@ -33,7 +33,6 @@ import java.util.stream.Stream;
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
 public class TransferServiceImpl implements TransferService {
-
 
     private TransferStoreService transferStoreService;
 

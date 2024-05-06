@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Contributors:
- *       SAP SE - initial implementation
+ *       SAP SE - initial API and implementation
  *
  ********************************************************************************/
 
@@ -49,8 +49,6 @@ public class TransferApiController {
     @Produces((MediaType.APPLICATION_JSON))
     @Consumes((MediaType.APPLICATION_JSON))
     public TransferRequest insertTransfer(TransferRequest transferRequest) {
-        monitor.info("insertTransfer POST request " + transferRequest);
-
         Transfer transfer = Transfer.Builder.newInstance()
                 .id(transferRequest.getId())
                 .endpoint(transferRequest.getEndpoint())

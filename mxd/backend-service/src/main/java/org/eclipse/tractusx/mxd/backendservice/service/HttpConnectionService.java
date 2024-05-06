@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Contributors:
- *       SAP SE - initial implementation
+ *       SAP SE - initial API and implementation
  *
  ********************************************************************************/
 
@@ -16,6 +16,7 @@ package org.eclipse.tractusx.mxd.backendservice.service;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 import org.eclipse.edc.spi.http.EdcHttpClient;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.tractusx.mxd.backendservice.entity.Transfer;
@@ -44,11 +45,11 @@ public class HttpConnectionService {
                 .header(receivedModel.getAuthKey(), receivedModel.getAuthCode())
                 .get()
                 .build();
-        try (var response = httpClient.execute(getRequest)) {
+        try (Response response = httpClient.execute(getRequest)) {
             if (response.isSuccessful()) {
                 if (response.body() != null) {
                     monitor.info("response  " + response.body());
-                    return String.valueOf(response.body());
+                    return response.body().string();
                 } else {
                     monitor.warning("Response body is null");
                 }

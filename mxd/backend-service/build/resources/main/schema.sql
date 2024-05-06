@@ -8,7 +8,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 --  Contributors:
---       SAP SE - initial implementation
+--       SAP SE - initial API and implementation
 --
 
 -- Statements are designed for and tested with Postgres only!
