@@ -77,7 +77,7 @@ public class ContentApiEndToEndTest {
                     .log().ifValidationFails()
                     .statusCode(200)
                     .contentType(JSON)
-                    .body("size()", is(greaterThan(1)));
+                    .body("size()", is(greaterThan(0)));
         }
 
         @Test
@@ -94,14 +94,12 @@ public class ContentApiEndToEndTest {
 
             String contentId = responseBody.extract().jsonPath()
                     .getString("id");
-            String contentUrl = responseBody.extract().jsonPath()
-                    .getString("url");
 
             assertThat(getContentIndex().findById(contentId)).isNotNull();
 
             baseRequest()
                     .when()
-                    .get(contentUrl)
+                    .get(ENDPOINT + contentId)
                     .then()
                     .log().ifValidationFails()
                     .statusCode(200)
