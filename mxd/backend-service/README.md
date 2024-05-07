@@ -9,7 +9,21 @@ Backend Service is used to validate the transfer. It has the following APIs.
 
 ## Contents API
 
-### Store an Asset
+### Generate a random content
+
+- Method : GET
+- URL : http://localhost/backend-service/api/v1/contents/random
+- Sample Response
+
+```json
+{
+  "userId": 718895412,
+  "title": "tmnx",
+  "text": "ivj"
+}
+```
+
+### Save the generated content
 
 - Method : POST
 - URL : http://localhost/backend-service/api/v1/contents
@@ -17,40 +31,37 @@ Backend Service is used to validate the transfer. It has the following APIs.
 
 ```json
 {
-  "userId": 1,
-  "id": 1,
-  "title": "delectus aut autem",
-  "completed": false
+  "userId": 718895412,
+  "title": "tmnx",
+  "text": "ivj"
 }
 ```
 
-- Response
+- Sample Response containing content id and url
 
 ```json
 {
   "id": "3b777103-5e06-461b-90c6-1f99e597f60d",
-  "url": "http://localhost:9000/api/v1/contents/3b777103-5e06-461b-90c6-1f99e597f60d"
+  "url": "http://localhost:8080/api/v1/contents/3b777103-5e06-461b-90c6-1f99e597f60d"
 }
 ```
+This URL will be used as a Endpoint in the transfer API.
 
-### Fetch an Asset
+### Fetch a Content
 
 - Method : GET
-- URL : http://localhost/backend-service/api/v1/contents/{id}
-- Response
+- URL : http://localhost/backend-service/api/v1/contents/{content-id}
+- Sample Response
 
 ```json
 {
-  "userId": 1,
-  "id": 1,
-  "title": "delectus aut autem",
-  "completed": false
+  "userId": 718895412,
+  "title": "tmnx",
+  "text": "ivj"
 }
 ```
 
-This URL will be used as a DataAddress in the assets API.
-
-### Fetch All Assets
+### Fetch All Contents
 
 - Method : GET
 - URL : http://localhost/backend-service/api/v1/contents
@@ -73,19 +84,6 @@ This URL will be used as a DataAddress in the assets API.
 ]
 ```
 
-### Generate a random content
-
-- Method : GET
-- URL : http://localhost/backend-service/api/v1/contents/random
-- Response
-
-```json
-{
-  "userId": 894688136,
-  "title": "fijp",
-  "text": "wvfaauux"
-}
-```
 
 ## Transfer API
 
@@ -95,7 +93,7 @@ Connector will push something similar to this:
 ```json
 {
   "id": "123456789011",
-  "endpoint": "http://alice-tractusx-connector-dataplane:8081/api/public",
+  "endpoint": "<Content Url>",
   "authKey": "Authorization",
   "authCode": "<Auth Code>",
   "properties": {}
@@ -109,7 +107,7 @@ Connector will push something similar to this:
 ```json
 {
   "id": "123456789011",
-  "endpoint": "http://alice-tractusx-connector-dataplane:8081/api/public",
+  "endpoint": "http://localhost:8080/api/v1/contents/3b777103-5e06-461b-90c6-1f99e597f60d",
   "authKey": "Authorization",
   "authCode": "100000",
   "properties": {}
@@ -120,59 +118,30 @@ Connector will push something similar to this:
 
 - Method : GET
 - URL : http://localhost/backend-service/api/v1/transfers/{id}
-- Response
+- Sample Response
 
 ```json
 {
   "id": "123456789011",
-  "endpoint": "http://alice-tractusx-connector-dataplane:8081/api/public",
+  "endpoint": "http://localhost:8080/api/v1/contents/3b777103-5e06-461b-90c6-1f99e597f60d",
   "authKey": "Authorization",
   "authCode": "100000",
   "properties": {}
 }
 ```
 
-### Get Actual Asset Content
-Get the data which is stored at the above endpoint http://alice-tractusx-connector-dataplane:8081/api/public
+### Get Transfer Content
+Get the content which is stored at the above endpoint
 - Method : GET
 - URL : http://localhost/backend-service/api/v1/transfers/{id}/contents
-- Response
+- Sample Response
 
 ```json
 {
-  "userId": 123456789011,
-  "id": 6,
-  "title": "qui ullam ratione quibusdam voluptatem quia omnis",
-  "completed": false
+  "userId": 718895412,
+  "title": "tmnx",
+  "text": "ivj"
 }
 ```
 
-
-## Database Schema
-
-### following Schema is used for contents
-
-```shell
-CREATE TABLE IF NOT EXISTS content
-(
-    id          text,
-    asset       text,
-    createddate timestamp(6) DEFAULT CURRENT_TIMESTAMP,
-    updateddate timestamp(6) DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT content_pkey PRIMARY KEY (id)
-);
-```
-
-### following Schema is used for transfer
-
-```shell
-CREATE TABLE IF NOT EXISTS transfer
-(
-    transferid  text,
-    asset       text,
-    contents    text,
-    createddate timestamp(6) DEFAULT CURRENT_TIMESTAMP,
-    updateddate timestamp(6) DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT transfer_pkey PRIMARY KEY (transferid)
-);
-```
+Alternatively, please check out the [Postman collections here](./assets/postman)
