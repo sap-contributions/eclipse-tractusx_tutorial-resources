@@ -74,7 +74,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userId\": 386200796,\r\n    \"title\": \"hqysxhvq\",\r\n    \"text\": \"pkloc\"\r\n}",
+					"raw": "{\r\n    \"userId\": 6,\r\n    \"title\": \"uazv\",\r\n    \"text\": \"sqb\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -171,7 +171,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"id\": \"1\",\r\n  \"endpoint\": \"http://localhost/api/v1/contents/86efe172-c566-427c-93fa-f7f9a877c74f\",\r\n  \"authKey\": \"Authorization\",\r\n  \"authCode\": \"100000\",\r\n  \"properties\": {}\r\n}",
+					"raw": "{\r\n  \"id\": \"30\",\r\n  \"endpoint\": \"http://localhost:8080/api/v1/contents/dd5e06c0-caa3-42d5-ba0e-2ef96c9377d5\",\r\n  \"authKey\": \"Authorization\",\r\n  \"authCode\": \"100000\",\r\n  \"properties\": {}\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -212,7 +212,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost/backend-service/api/v1/transfers/1",
+					"raw": "http://localhost/backend-service/api/v1/transfers/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -222,7 +222,40 @@
 						"api",
 						"v1",
 						"transfers",
-						"1"
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAllTransfers",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": \"123456789011\",\r\n  \"endpoint\": \"http://alice-tractusx-connector-dataplane:8081/api/public\",\r\n  \"authKey\": \"Authorization\",\r\n  \"authCode\": \"100000\",\r\n  \"properties\": {}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost/backend-service/api/v1/transfers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"backend-service",
+						"api",
+						"v1",
+						"transfers"
 					]
 				}
 			},
@@ -246,7 +279,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost/backend-service/api/v1/transfers/1/contents",
+					"raw": "http://localhost/backend-service/api/v1/transfers/30/contents",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -256,7 +289,7 @@
 						"api",
 						"v1",
 						"transfers",
-						"1",
+						"30",
 						"contents"
 					]
 				}
