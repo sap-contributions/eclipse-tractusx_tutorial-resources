@@ -17,10 +17,8 @@ package org.eclipse.tractusx.mxd.backendservice.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
-import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.tractusx.mxd.backendservice.service.ContentService;
 import org.eclipse.tractusx.mxd.util.Constants;
@@ -47,10 +45,9 @@ public class ContentApiController {
     }
 
     @POST
-    public String createContent(Object contentJson, @Context UriInfo uriInfo) {
+    public String createContent(Object contentJson) {
         var contentID = this.service.create(contentJson);
-        monitor.info(uriInfo.getAbsolutePath() + "/" + contentID);
-        return createJsonResponse(contentID, uriInfo);
+        return createJsonResponse(contentID);
     }
 
     @GET
@@ -73,10 +70,11 @@ public class ContentApiController {
         return this.service.getRandomContent();
     }
 
-    private String createJsonResponse(String id, UriInfo uriInfo) {
+    private String createJsonResponse(String id) {
         JsonNode jsonResponse = objectMapper.createObjectNode()
                 .put("id", id)
-                .put("url", UriBuilder.fromUri(uriInfo.getBaseUri())
+                .put("url", UriBuilder.fromUri("http://localhost:8080")
+                        .path("api")
                         .path("v1")
                         .path("contents")
                         .path(String.valueOf(id))
