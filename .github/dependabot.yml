@@ -42,6 +42,20 @@ updates:
     ignore:
       - dependency-name: "org.eclipse.edc:edc-versions"
 
+  # maintain dependencies for backend service
+  - package-ecosystem: "gradle" # checks build.gradle(.kts) and settings.gradle(.kts)
+    directory: "/mxd/backend-service"
+    schedule:
+      interval: "daily"
+      time: "10:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "java"
+    ignore:
+      - dependency-name: "org.eclipse.edc:edc-versions"
+    target-branch: "backend-service-with-tests"
+
   - package-ecosystem: "terraform"
     directory: "/mxd"
     schedule:
