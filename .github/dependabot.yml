@@ -22,13 +22,14 @@ version: 2
 updates:
   # maintain dependencies for backend service
   - package-ecosystem: "gradle" # checks build.gradle(.kts) and settings.gradle(.kts)
-    directory: "/mxd/backend-service"
+    directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 5
+    target-branch: "backend-service-with-tests"
     labels:
       - "dependencies"
       - "java"
     ignore:
       - dependency-name: "org.eclipse.edc:edc-versions"
-    target-branch: "backend-service-with-tests"
+    
