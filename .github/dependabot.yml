@@ -22,7 +22,7 @@ version: 2
 updates:
   # maintain dependencies for backend service
   - package-ecosystem: "gradle" # checks build.gradle(.kts) and settings.gradle(.kts)
-    directory: "/mxd/backend-service"
+    directory: "/mxd/backend-service/gradle"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 5
