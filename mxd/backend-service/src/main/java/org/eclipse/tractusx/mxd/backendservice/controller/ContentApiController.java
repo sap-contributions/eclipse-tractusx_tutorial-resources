@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.tractusx.mxd.backendservice.service.ContentService;
@@ -72,14 +73,51 @@ public class ContentApiController {
 
     @GET
     @Path("/random")
-    public String getRandomContent() {
-        return this.service.getRandomContent();
+    public Response getRandomContent(@QueryParam("size") @DefaultValue("1KB") String size) {
+        if (!isValidSizeParam(size)) {
+            return createResponse("Invalid size param. Use KB or MB.",
+                    Response.Status.BAD_REQUEST);
+        }
+        String content = this.service.getRandomContent(size);
+        return createResponse(content, Response.Status.OK);
+    }
+
+    @GET
+    @Path("/create/random")
+    public Response createRandomContent(@QueryParam("size") @DefaultValue("1KB") String size) {
+        if (!isValidSizeParam(size)) {
+            return createResponse("Invalid size param. Use KB or MB.",
+                    Response.Status.BAD_REQUEST);
+        }
+
+        var contentID = this.service.createRandomContent(size);
+        String content  = createJsonResponse(contentID);
+        return createResponse(content, Response.Status.OK);
+    }
+
+    private boolean isValidSizeParam(String size) {
+        if (size.endsWith("KB") || size.endsWith("MB")) {
+            try {
+                Integer.parseInt(size.substring(0, size.length() - 2).trim());
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private Response createResponse(String content, Response.Status status) {
+        return Response
+                .status(status)
+                .entity(content)
+                .build();
     }
 
     private String createJsonResponse(String id) {
         JsonNode jsonResponse = objectMapper.createObjectNode()
                 .put("id", id)
-                .put("url", UriBuilder.fromUri("http://" + host  +  ":" + port)
+                .put("url", UriBuilder.fromUri("http://" + host + ":" + port)
                         .path("api")
                         .path("v1")
                         .path("contents")

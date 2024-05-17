@@ -15,19 +15,21 @@
 package org.eclipse.tractusx.mxd.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.edc.spi.EdcException;
 
 import java.security.SecureRandom;
 
 public class RandomWordUtil {
 
-    public static String generateRandom() {
+    public static String generateRandom(String size) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             RandomData randomData = new RandomData();
             randomData.setUserId(generateRandomUserId());
-            randomData.setTitle(generateRandomString());
-            randomData.setText(generateRandomString());
+            randomData.setTitle(generateRandomString(0));
+            int sizeInBytes = parseSize(size);
+            randomData.setText(generateRandomString(sizeInBytes));
             return objectMapper.writeValueAsString(randomData);
         } catch (Exception e) {
             throw new EdcException(e.getMessage());
@@ -38,17 +40,21 @@ public class RandomWordUtil {
         return Math.abs(new SecureRandom().nextInt());
     }
 
-    private static String generateRandomString() {
-        String characters = "abcdefghijklmnopqrstuvwxyz";
-        SecureRandom random = new SecureRandom();
-        StringBuilder sb = new StringBuilder();
+    private static String generateRandomString(int length) {
+        length = length == 0 ? 8 : length;
+        return StringUtils.repeat("a", length);
+    }
 
-        int length = random.nextInt(8) + 1;
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(characters.length());
-            sb.append(characters.charAt(index));
+    private static int parseSize(String size) {
+        int sizeInBytes = 0;
+        if (size.endsWith("KB")) {
+            sizeInBytes = Integer.parseInt(
+                    size.replace("KB", "").trim()) * 1024;
+        } else if (size.endsWith("MB")) {
+            sizeInBytes = Integer.parseInt(
+                    size.replace("MB", "").trim()) * 1024 * 1024;
         }
-        return sb.toString();
+        return sizeInBytes;
     }
 
     private static class RandomData {

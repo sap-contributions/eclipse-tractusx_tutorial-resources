@@ -25,6 +25,8 @@ public interface ContentService {
 
     StoreResult<ContentResponse> getContent(String contentId);
 
-    String getRandomContent();
+    String getRandomContent(String size);
+
+    String createRandomContent(String size);
 
 }

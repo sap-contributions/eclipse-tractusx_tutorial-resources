@@ -98,6 +98,52 @@
 			"response": []
 		},
 		{
+			"name": "CreateRandomContent",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost/backend-service/api/v1/contents/random",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"backend-service",
+						"api",
+						"v1",
+						"contents",
+						"random"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "GetAllContents",
 			"request": {
 				"method": "GET",

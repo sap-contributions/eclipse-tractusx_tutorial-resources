@@ -124,6 +124,33 @@ public class ContentApiEndToEndTest {
 
         }
 
+        @Test
+        void createRandomContent() {
+            var responseBody = baseRequest()
+                    .when()
+                    .get(ENDPOINT + "create/random")
+                    .then()
+                    .log().ifValidationFails()
+                    .statusCode(200);
+
+            String contentId = responseBody.extract().jsonPath()
+                    .getString("id");
+
+            assertThat(getContentIndex().findById(contentId)).isNotNull();
+
+            baseRequest()
+                    .when()
+                    .get(ENDPOINT + contentId)
+                    .then()
+                    .log().ifValidationFails()
+                    .statusCode(200)
+                    .contentType(JSON)
+                    .body("userId", not(emptyString()))
+                    .body("title", not(emptyString()))
+                    .body("text", hasLength(1024));
+
+        }
+
         private ContentStoreService getContentIndex() {
             return runtime.getContext().getService(ContentStoreService.class);
         }
