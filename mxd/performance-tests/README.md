@@ -172,6 +172,9 @@ For more information about arguments visit [help.txt](help.txt).
 #### Run all files from test-configurations folder on separate clusters
 ```./experiment_controller.sh -f test-configurations -x kind-mxd -y shoot--edc-lpt--mxd```
 
+
+./experiment_controller.sh -f test-configurations -x shoot--ciprian--ciprian-test -y shoot--edc-lpt--mxd
+
 Enjoy the test results!
 
 ### Test results
@@ -189,20 +192,10 @@ Of relevance is the sub-item "Statistics" in index.html. This sub-item contains,
 
 ### Customizing the Experiments
 
-1. [OPTIONAL] Review and update the connectors properties in the three different .properties files. A brief explanation of all properties can be found in the User Guide of this document.
-2. Execute the [run_experiment.sh](mxd-performance-evaluation/run_experiment.sh) script (Bash4 required). To do this, enter the corresponding arguments (two required), on which parameters the execution should be carried out and which of the two phases of the experiment (as described in the test design) should be executed.
+1. [OPTIONAL] Review and update the connectors properties in the three different .properties files.
 
-**.properties -files "-q": (First argument)**
-
-| Naming                        | Default Values               |
+| Naming                       | Default Values               |
 |------------------------------|------------------------------|
-| S = small_experiment.properties     | Supplier/OEM Plants = 1, Initial cars/parts = 10000  |
-| M = medium_experiment.properties    | Supplier/OEM Plants = 5, Initial cars/parts = 100000  |
-| L = medium_experiment.properties     | Supplier/OEM Plants = 10, Initial cars/parts = 1000000  |
-
-**.jmx -files "-t": (Second argument)**
-
-| Letter                       | Execution of            |
-|------------------------------|------------------------------|
-| S    | setup.jmx  |
-| M  | measurement.jmx  |
+| small_experiment.properties  | Supplier/OEM Plants = 1, Initial cars/parts = 10000  |
+| medium_experiment.properties | Supplier/OEM Plants = 5, Initial cars/parts = 100000  |
+| medium_experiment.properties | Supplier/OEM Plants = 10, Initial cars/parts = 1000000  |
