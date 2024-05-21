@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "2331eb24-a4fe-4841-b2c0-4333e3fd47e3",
+		"_postman_id": "6ee67c0d-1b48-47e1-8702-b5099aec1e83",
 		"name": "tractusx-edc-mgmt-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "252261",
-		"_collection_link": "https://winter-rocket-884715.postman.co/workspace/SAP~ff4cf631-05f4-48ab-a1e0-f716cf2efc25/collection/252261-2331eb24-a4fe-4841-b2c0-4333e3fd47e3?action=share&source=collection_link&creator=252261"
+		"_collection_link": "https://winter-rocket-884715.postman.co/workspace/SAP~ff4cf631-05f4-48ab-a1e0-f716cf2efc25/collection/252261-6ee67c0d-1b48-47e1-8702-b5099aec1e83?action=share&source=collection_link&creator=252261"
 	},
 	"item": [
 		{
@@ -70,6 +70,50 @@
 					"path": [
 						"business-partner-groups",
 						"{{POLICY_BPN}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get BPN Mapping",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/bdrs/api/bpn-directory",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"bdrs",
+						"api",
+						"bpn-directory"
 					]
 				}
 			},
@@ -366,7 +410,8 @@
 							"});\r",
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -375,7 +420,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"@context\": {\r\n        \"edc\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n    },\r\n    \"@type\": \"CatalogRequest\",\r\n    \"counterPartyAddress\":\"{{PROVIDER_PROTOCOL_URL}}\",\r\n    \"protocol\": \"dataspace-protocol-http\",\r\n    \"querySpec\": {\r\n        \"offset\": 0,\r\n        \"limit\": 50\r\n    }\r\n}",
+					"raw": "{\r\n  \"@context\": {\r\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\r\n  },\r\n  \"@type\": \"CatalogRequest\",\r\n  \"counterPartyAddress\": \"{{PROVIDER_PROTOCOL_URL}}\",\r\n  \"counterPartyId\": \"{{PROVIDER_ID}}\",\r\n  \"protocol\": \"dataspace-protocol-http\",\r\n  \"querySpec\": {\r\n    \"offset\": 0,\r\n    \"limit\": 50\r\n  }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -409,7 +454,8 @@
 							"",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -418,7 +464,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
