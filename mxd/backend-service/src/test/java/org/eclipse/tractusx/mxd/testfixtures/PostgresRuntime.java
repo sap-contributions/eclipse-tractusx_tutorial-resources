@@ -27,7 +27,6 @@ public interface PostgresRuntime {
 
     @RegisterExtension
     public static final EdcRuntimeExtension RUNTIME = new EdcRuntimeExtension(
-            "",
             "backend",
             Map.of(
                     "edc.datasource.default.url", PostgresqlEndToEndInstance.JDBC_URL_PREFIX + PostgresqlEndToEndInstance.DB_NAME,

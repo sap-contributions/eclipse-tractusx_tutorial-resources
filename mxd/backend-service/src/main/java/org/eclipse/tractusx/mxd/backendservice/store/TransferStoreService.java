@@ -49,30 +49,12 @@ public interface TransferStoreService {
     StoreResult<TransferResponse> findById(String contentId);
 
     /**
-     * Stores the transfer if a transfer with the same ID doesn't already exists.
+     * Stores the transfer if a transfer with the same ID doesn't already exist.
      *
      * @param content {@link Content} to store.
      * @return {@link StoreResult#success()} if the transfer was stored, {@link StoreResult#alreadyExists(String)} if a contract
      * definition with the same ID already exists.
      */
     StoreResult<Void> save(Transfer transfer, String content);
-
-    /**
-     * Update the transfer if a transfer with the same ID exists.
-     *
-     * @param transfer {@link Content} to update.
-     * @return {@link StoreResult#success()} if the transfer was updates, {@link StoreResult#notFound(String)} if a contract
-     * definition identified by the ID was not found.
-     */
-    StoreResult<Void> update(Transfer transfer);
-
-    /**
-     * Deletes the transfer with the given id.
-     *
-     * @param id A String that represents the {@link Content} ID, in most cases this will be a UUID.
-     * @return {@link StoreResult#success()}} if the transfer was deleted, {@link StoreResult#notFound(String)} if the transfer
-     * was not found in the store.
-     */
-    StoreResult<Transfer> deleteById(String id);
 
 }

@@ -74,13 +74,9 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public StoreResult<TransferResponse> getTransfer(String transferId) {
-        return this.transferStoreService.findById(transferId);
-    }
-
-    @Override
-    public StoreResult<TransferResponse> getTransferContent(String transferId) {
-        return this.transferStoreService.findById(transferId);
+    public ServiceResult<TransferResponse> getTransfer(String transferId) {
+        StoreResult<TransferResponse> response = this.transferStoreService.findById(transferId);
+        return ServiceResult.success(response.getContent());
     }
 
 }

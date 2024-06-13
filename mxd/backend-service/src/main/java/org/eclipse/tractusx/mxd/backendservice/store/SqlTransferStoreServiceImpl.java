@@ -93,16 +93,6 @@ public class SqlTransferStoreServiceImpl extends AbstractSqlStore implements Tra
         return null;
     }
 
-    @Override
-    public StoreResult<Void> update(Transfer transfer) {
-        return null;
-    }
-
-    @Override
-    public StoreResult<Transfer> deleteById(String id) {
-        return null;
-    }
-
     private TransferResponse mapResultSet(ResultSet resultSet) throws Exception {
         TransferResponse response = TransferResponse.builder()
                 .asset(resultSet.getString(statements.getAssetColumn()))

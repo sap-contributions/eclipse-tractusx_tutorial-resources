@@ -48,29 +48,12 @@ public interface ContentStoreService {
     StoreResult<ContentResponse> findById(String contentId);
 
     /**
-     * Stores the content  a content with the same ID doesn't already exists.
+     * Stores the content  a content with the same ID doesn't already exist.
      *
      * @param content {@link Content} to store.
      * @return {@link StoreResult#success()} if the content was stored, {@link StoreResult#alreadyExists(String)} if a contract
      * definition with the same ID already exists.
      */
     String save(Object content);
-
-    /**
-     * Update the content if a content with the same ID exists.
-     *
-     * @param content {@link Content} to update.
-     * @return {@link StoreResult#success()} if the content was updates, {@link StoreResult#notFound(String)} if a contract
-     * definition identified by the ID was not found.
-     */
-    StoreResult<Void> update(Content content);
-
-    /**
-     * Deletes the content with the given id.
-     *
-     * @param id A String that represents the {@link Content} ID, in most cases this will be a UUID.
-     * @return {@link StoreResult#success()}} if the content was deleted, {@link StoreResult#notFound(String)} if the content was not found in the store.
-     */
-    StoreResult<Content> deleteById(String id);
 
 }

@@ -97,7 +97,6 @@ public class Transfer extends Entity {
 
         @Override
         public Transfer build() {
-            super.build();
             return entity;
         }
     }

@@ -63,8 +63,6 @@ public class Content extends Entity {
 
         @Override
         public Content build() {
-            super.build();
-
             return entity;
         }
     }

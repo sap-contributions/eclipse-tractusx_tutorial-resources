@@ -19,12 +19,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
+import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.tractusx.mxd.backendservice.service.ContentService;
 import org.eclipse.tractusx.mxd.util.Constants;
 import org.eclipse.tractusx.mxd.util.Converter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -57,7 +59,7 @@ public class ContentApiController {
     }
 
     @GET
-    public String getAllContent() {
+    public List<String> getAllContent() {
         return this.service.getAllContent();
     }
 
@@ -67,7 +69,7 @@ public class ContentApiController {
         return Optional.of(contentId)
                 .map(id -> service.getContent(contentId))
                 .map(content -> content.getContent() != null ? content.getContent().getData() : Converter.toJson(content.getFailure(), objectMapper))
-                .orElse(Constants.DEFAULTERRORMESSAGE);
+                .orElse(Constants.DEFAULT_ERROR_MESSAGE);
     }
 
     @GET
@@ -88,7 +90,7 @@ public class ContentApiController {
         try {
             return objectMapper.writeValueAsString(jsonResponse);
         } catch (IOException e) {
-            return "{\"error\": \"" + e.getMessage() + "\"}";
+            throw new EdcException(e.getMessage());
         }
     }
 

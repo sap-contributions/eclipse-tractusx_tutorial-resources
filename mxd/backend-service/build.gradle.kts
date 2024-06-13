@@ -13,7 +13,6 @@
  ********************************************************************************/
 
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
 
 plugins {
     id("java")
@@ -46,14 +45,11 @@ dependencies {
     implementation(libs.edc.http.lib)
     implementation(libs.edc.http.spi)
     implementation(libs.edc.jersey.core)
-    implementation(libs.swagger.core)
     implementation(libs.edc.transaction.spi)
     implementation(libs.edc.connector.core)
     implementation(libs.edc.sql.core)
     implementation(libs.apache.commons)
     implementation(libs.postgresql)
-    implementation(libs.edc.transform)
-    implementation(libs.edc.transaction)
     implementation(libs.edc.util)
 
     testImplementation(platform(libs.junit.bom))
@@ -87,7 +83,7 @@ tasks {
 
 tasks.register("printClasspath") {
     doLast {
-        println("${sourceSets["main"].runtimeClasspath.asPath}");
+        println("${sourceSets["main"].runtimeClasspath.asPath}")
     }
 }
 // this task copies some legal docs into the build folder, so we can easily copy them into the docker images

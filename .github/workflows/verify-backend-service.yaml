@@ -17,6 +17,7 @@ on:
   push:
     branches:
       - main
+      - backend-service
 
   pull_request:
     branches:

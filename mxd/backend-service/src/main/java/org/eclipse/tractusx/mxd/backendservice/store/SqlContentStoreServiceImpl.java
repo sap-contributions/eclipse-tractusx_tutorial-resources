@@ -23,7 +23,6 @@ import org.eclipse.edc.sql.QueryExecutor;
 import org.eclipse.edc.sql.store.AbstractSqlStore;
 import org.eclipse.edc.transaction.datasource.spi.DataSourceRegistry;
 import org.eclipse.edc.transaction.spi.TransactionContext;
-import org.eclipse.tractusx.mxd.backendservice.entity.Content;
 import org.eclipse.tractusx.mxd.backendservice.entity.ContentResponse;
 import org.eclipse.tractusx.mxd.backendservice.statements.ContentStatementsService;
 import org.jetbrains.annotations.NotNull;
@@ -103,15 +102,12 @@ public class SqlContentStoreServiceImpl extends AbstractSqlStore implements Cont
         try {
             monitor.info(toJson(content));
             UUID uuid = UUID.randomUUID();
-            int affectedRow = queryExecutor.execute(connection, statements.getInsertTemplate(), uuid, toJson(content), new Date(), new Date());
-            if (affectedRow > 0) {
-                return uuid;
-            }
+            queryExecutor.execute(connection, statements.getInsertTemplate(), uuid, toJson(content), new Date(), new Date());
+            return uuid;
         } catch (Exception exception) {
             monitor.warning(exception.getMessage());
             throw new EdcPersistenceException(exception.getMessage(), exception);
         }
-        return null;
     }
 
     private ContentResponse mapResultSet(ResultSet resultSet) throws Exception {
@@ -126,15 +122,5 @@ public class SqlContentStoreServiceImpl extends AbstractSqlStore implements Cont
     private ContentResponse findContentById(Connection connection, String id) {
         var sql = statements.getFindByTemplate();
         return queryExecutor.single(connection, false, this::mapResultSet, sql, id);
-    }
-
-    @Override
-    public StoreResult<Void> update(Content definition) {
-        return null;
-    }
-
-    @Override
-    public StoreResult<Content> deleteById(String id) {
-        return null;
     }
 }
