@@ -172,10 +172,33 @@ For more information about arguments visit [help.txt](help.txt).
 #### Run all files from test-configurations folder on separate clusters
 ```./experiment_controller.sh -f test-configurations -x kind-mxd -y shoot--edc-lpt--mxd```
 
+### Visualizing Aggregated Test Results
+1. Install python (this script was tested with python version: 3.8.10)
+2. Install following python libraries with your package manager(e.g., [pip](https://pip.pypa.io/en/stable/)): 
+   1. numpy
+   2. scikit-learn
+   3. plotly 
+3. Run the [result aggregation](mxd-performance-evaluation/results_aggregation.py) script to visualize the result with the following command.
+   ```python3 results_aggregation.py <test-result-folder> <output.html>```
+4. To visualize aggregated result with regression analysis, use the following command:
+   ```python3 results_aggregation.py <test-result-folder> <output.html> --regression <operation_name>```
+5. Replace <test-result-folder> with the path to the folder containing your test results
 
-./experiment_controller.sh -f test-configurations -x shoot--ciprian--ciprian-test -y shoot--edc-lpt--mxd
+   The expected folder structure for the <test-result-folder> is as follows:
+    - Test collection result folder
+      - Experiment 1
+          - metadata file
+          - dashboard folder
+              - statistics file
+      - Experiment 2
+          - metadata file
+          - dashboard folder
+              - statistics file
+6. Replace <output.html> with the desired name for the output HTML file.
+7. Replace <operation_name> with desired operation name, e.g- 'OEM Query Catalog'
 
-Enjoy the test results!
+#### Example
+```python3 results_aggregation.py test-result output.html --regression 'OEM Query Catalog'```
 
 ### Test results
 After executing the shell script, the test results can be viewed at /Output/measurement_interval/index.html.
@@ -192,10 +215,20 @@ Of relevance is the sub-item "Statistics" in index.html. This sub-item contains,
 
 ### Customizing the Experiments
 
-1. [OPTIONAL] Review and update the connectors properties in the three different .properties files.
+1. [OPTIONAL] Review and update the connectors properties in the three different .properties files. A brief explanation of all properties can be found in the User Guide of this document.
+2. Execute the [run_experiment.sh](mxd-performance-evaluation/run_experiment.sh) script (Bash4 required). To do this, enter the corresponding arguments (two required), on which parameters the execution should be carried out and which of the two phases of the experiment (as described in the test design) should be executed.
 
-| Naming                       | Default Values               |
+**.properties -files "-q": (First argument)**
+
+| Naming                        | Default Values               |
 |------------------------------|------------------------------|
-| small_experiment.properties  | Supplier/OEM Plants = 1, Initial cars/parts = 10000  |
-| medium_experiment.properties | Supplier/OEM Plants = 5, Initial cars/parts = 100000  |
-| medium_experiment.properties | Supplier/OEM Plants = 10, Initial cars/parts = 1000000  |
+| S = small_experiment.properties     | Supplier/OEM Plants = 1, Initial cars/parts = 10000  |
+| M = medium_experiment.properties    | Supplier/OEM Plants = 5, Initial cars/parts = 100000  |
+| L = medium_experiment.properties     | Supplier/OEM Plants = 10, Initial cars/parts = 1000000  |
+
+**.jmx -files "-t": (Second argument)**
+
+| Letter                       | Execution of            |
+|------------------------------|------------------------------|
+| S    | setup.jmx  |
+| M  | measurement.jmx  |
