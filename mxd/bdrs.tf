@@ -33,9 +33,11 @@ resource "helm_release" "bdrs-server" {
     yamlencode({
       postgresql : {
         auth : {
-          password : "postgres"
+          database: local.databases.bdrs.database-name
+          username: local.databases.bdrs.database-username
+          password: local.databases.bdrs.database-password
         }
-        jdbcUrl : "jdbc:postgresql://${local.pg-host}/bdrs"
+        jdbcUrl : "jdbc:postgresql://${local.bdrs-postgres.database-url}/${local.databases.bdrs.database-name}"
       }
     })
   ]
