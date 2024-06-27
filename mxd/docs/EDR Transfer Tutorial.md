@@ -7,7 +7,7 @@ simply request an API token to Alice's proxy, and start sucking data out of it.
 We don't even need to worry about token expiry - the EDR API has a little gizmo that automatically refreshes the token
 if it nears expiry.
 
-A detailed documentation about the EDR API is available [here](https://github.com/eclipse-tractusx/tractusx-edc/blob/main/docs/samples/edr-api-overview/edr-api-overview.md).
+A detailed documentation about the EDR API is available [here](https://github.com/eclipse-tractusx/tractusx-edc/blob/main/docs/usage/management-api-walkthrough/07_edrs.md).
 
 The EDR API is a tiny wrapper on top of the contract negotiation and transfer state machines. With a single request the system will track the EDR negotiation
 for us, and it will store it locally for future usage. The API for starting a new EDR negotiation is similar to the contract negotiation one.
@@ -19,37 +19,36 @@ curl --location 'http://localhost/bob/management/edrs' \
 --header 'Content-Type: application/json' \
 --header 'X-Api-Key: password' \
 --data-raw '{
-	"@context": {
-		"odrl": "http://www.w3.org/ns/odrl/2/"
-	},
-	"@type": "NegotiationInitiateRequestDto",
-	"counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
-	"protocol": "dataspace-protocol-http",
-	"counterPartyId": "BPNL000000000001",
-	"providerId": "BPNL000000000001",
-	"offer": {
-		"offerId": "MQ==:MQ==:MDJlMGRlOWUtNzdhZS00N2FhLTg5ODktYzEyMTdhMDE4ZjJh",
-		"assetId": "1",
-		"policy": {
-			"@type": "odrl:Set",
-			"odrl:permission": {
-			    "odrl:target": "1",
-				"odrl:action": {
-					"odrl:type": "USE"
-				},
-				"odrl:constraint": {
-					"odrl:or": {
-						"odrl:leftOperand": "BusinessPartnerNumber",
-						"odrl:operator": { "@id": "odrl:eq" },
-						"odrl:rightOperand": "BPNL000000000002"
-					}
-				}
-			},
-			"odrl:prohibition": [],
-			"odrl:obligation": [],
-			"odrl:target": "1"
-		}
-	}
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "https://w3id.org/edc/v0.0.1/ns/ContractRequest",
+  "counterPartyAddress": "{{PROVIDER_PROTOCOL_URL}}",
+  "protocol": "dataspace-protocol-http",
+  "policy": {
+    "@context": "http://www.w3.org/ns/odrl.jsonld",
+    "@type": "odrl:Offer",
+    "@id": "<OFFER_ID>",
+    "assigner": "<PROVIDER_ID>",
+    "permission": [{
+        "odrl:target": "<ASSET_ID>",
+        "odrl:action": {
+          "odrl:type": "USE"
+        },
+        "odrl:constraint": {
+          "odrl:or": {
+            "odrl:leftOperand": "https://w3id.org/tractusx/v0.0.1/ns/BusinessPartnerGroup",
+            "odrl:operator": {
+              "@id": "odrl:eq"
+            },
+            "odrl:rightOperand": "<BUSINESS_PARTNER_GROUP>"
+          }
+        }
+      }],
+    "prohibition": [],
+    "obligation": [],
+    "target": "<ASSET_ID>"
+  }
 }' | jq
 ```
 
@@ -63,17 +62,17 @@ If everithing is ok, we'll get this as response:
 
 ```json
 {
-  "@type": "edc:IdResponse",
-  "@id": "2f911118-657d-4001-b36c-73cb45222a4a",
-  "edc:createdAt": 1694446314832,
-  "@context": {
-    "dct": "https://purl.org/dc/terms/",
-    "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
-    "edc": "https://w3id.org/edc/v0.0.1/ns/",
-    "dcat": "https://www.w3.org/ns/dcat/",
-    "odrl": "http://www.w3.org/ns/odrl/2/",
-    "dspace": "https://w3id.org/dspace/v0.8/"
-  }
+    "@type": "IdResponse",
+    "@id": "ac97aceb-e283-4f84-b04a-31d67e030c72",
+    "createdAt": 1718084723740,
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+        "edc": "https://w3id.org/edc/v0.0.1/ns/",
+        "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+        "tx-auth": "https://w3id.org/tractusx/auth/",
+        "cx-policy": "https://w3id.org/catenax/policy/",
+        "odrl": "http://www.w3.org/ns/odrl/2/"
+    }
 }
 ```
 
@@ -89,11 +88,10 @@ We could for example add this in the original request:
   ...
   "callbackAddresses": [
     {
-      "uri": "http://localhost:8080/hooks",
-      "events": [
-        "transfer.process.started"
-      ],
-      "transactional": false
+		"events": [
+			"transfer.process.started"
+		],
+		"uri": "https://mybackend/edr"
     }
   ]
 }
@@ -104,30 +102,47 @@ and be notified when the transfer process transition to the state `STARTED` (EDR
 For having a list of the negotiatied EDR for the `assedId` `1` we can use this `curl` command:
 
 ```shell
-curl --location 'http://localhost/bob/management/edrs?assetId=1' --header 'X-Api-Key: password' | jq
+curl --location 'http://localhost/bob/management/v2/edrs/request' \
+--header 'Content-Type: application/json' \
+--header 'X-Api-Key: password' \
+--data-raw '{
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+    },
+    "@type": "QuerySpec",
+    "filterExpression": [
+        {
+            "operandLeft": "assetId",
+            "operator": "=",
+            "operandRight": "1"
+        }
+        
+    ]
+}'| jq
 ```
 
 and the response should look like this:
 
 ```json
 [
-  {
-    "@type": "tx:EndpointDataReferenceEntry",
-    "edc:agreementId": "MQ==:MQ==:MWI5OTg2N2YtNTc0ZS00MzUwLTk2NmMtNDFiODE2MzllZTVi",
-    "edc:transferProcessId": "89f0d94e-670e-4b0a-a8d9-a6adc726c005",
-    "edc:assetId": "1",
-    "edc:providerId": "BPNL000000000001",
-    "tx:edrState": "NEGOTIATED",
-    "tx:expirationDate": 1694447767000,
-    "@context": {
-      "dct": "https://purl.org/dc/terms/",
-      "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
-      "edc": "https://w3id.org/edc/v0.0.1/ns/",
-      "dcat": "https://www.w3.org/ns/dcat/",
-      "odrl": "http://www.w3.org/ns/odrl/2/",
-      "dspace": "https://w3id.org/dspace/v0.8/"
+    {
+        "@id": "a23ba377-ca7d-4b2f-89ca-b9e7d7fdaafc",
+        "@type": "EndpointDataReferenceEntry",
+        "providerId": "BPNL000000000001",
+        "assetId": "1",
+        "agreementId": "67fa5199-f5e2-4d65-a4e6-250a689ed607",
+        "transferProcessId": "a23ba377-ca7d-4b2f-89ca-b9e7d7fdaafc",
+        "createdAt": 1718084731633,
+        "contractNegotiationId": "ac97aceb-e283-4f84-b04a-31d67e030c72",
+        "@context": {
+            "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+            "edc": "https://w3id.org/edc/v0.0.1/ns/",
+            "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+            "tx-auth": "https://w3id.org/tractusx/auth/",
+            "cx-policy": "https://w3id.org/catenax/policy/",
+            "odrl": "http://www.w3.org/ns/odrl/2/"
+        }
     }
-  }
 ]
 ```
 
@@ -185,7 +200,7 @@ which means that the second `EDR` is now expired and marked for removal later in
 The EDR itself is stored in the configured vault. To retrieve it we can use this `curl` command:
 
 ```shell
-curl --location 'http://localhost/bob/management/edrs/ff468685-0f9b-49a1-8ec6-ea40d5a2dc88' --header 'X-Api-Key: password' | jq
+curl --location 'http://localhost/bob/management/v2/edrs/ff468685-0f9b-49a1-8ec6-ea40d5a2dc88/dataaddress' --header 'X-Api-Key: password' | jq
 ```
 
 where `ff468685-0f9b-49a1-8ec6-ea40d5a2dc88` is the transfer process id of negotiated EDR. Each EDR is bound to one and only transfer process,
@@ -195,20 +210,24 @@ The response will look like this:
 
 ```json
 {
-  "@type": "edc:DataAddress",
-  "edc:type": "EDR",
-  "edc:authCode": "eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE2OTQ1MjIwNTksImRhZCI6ImNoTTlvVTVLNXQzbDlWMFRsL1ZZdDlLU1J4YmNOSUdzM1FtazNlNktWOWpWcTBkeUhjUDU2Mm82Qk0zSitxeTRwRVg2d0EvWUFsdW9EdGptYnYxZlJoN3VmVmsvQjNONzhBMUhyZ01ENnk2enFsK1BEYzBXa00yTm9ycUJWQUl0TWpVNEFNbGhFMXE1Ym9EQ1lWcVRsQVZnbm9uTlB5MmlVUzVSVTJHTkZtOWFkZVZYR1ZLaDFDWEMzVDV0RkRCS21EMjExWVZYdDExRUlXbCtIU3VISm1PL0xwUUdibFkvaGFicXZ6aUZ0YlppbGlKSDNLdGVhZTZQRkdQTjNWT1Z4YlFrZTNmODNRN3VNeStBNzV4YS9VR1BMcjJlQkJzb0ZVbTBYeFFJS2dBOUROdGxXcnBuR3hwdG9tL1VWY00wQ1RwcWM5eFRRdGlnK3JMVlJ4dUhrb2RreG5KUXhiSENVMnNObnFhdXZJcDV4L04rbGdJN0F1amhtQWxiN2NwUWs0RDhSWWtZSnkvVUZGdGZmZUJLU2k2MnZDeC9QSFJsSERlUGM4VldDaEJTNFF1Q1FXY1pOK2oyUjR5b2Q2a3JlN2JtUStFK3pLUmYva3JhQkJkR041TDR5ZVdIYU0wS3oraGxiSVR5WHg2bjdrQ0VkVVVSREtCUHY3SHdzbHhLTzlxN05ReHplMHFDM0phR2pyWVdHZmJHTzB4SDlJRndsSWpqclZHMzE0WUVxNGdSTjNNPSIsImNpZCI6Ik1RPT06TVE9PTpOV0ZqTTJJeVkyWXRNRGt4WkMwME9UQmxMV0poTXpNdE1ERmxNRGhtTUdNNU5tVTIifQ.2UT3_mIjchrC242TqlLFWoyYPiCOPLLivaN5Xd4_MxhcQkxRkOxrK0IXkXVuRVjC1ReGPi3iaco9LDUxvF3FPw",
-  "edc:endpoint": "http://alice-tractusx-connector-dataplane:8081/api/public",
-  "edc:id": "ff468685-0f9b-49a1-8ec6-ea40d5a2dc88",
-  "edc:authKey": "Authorization",
-  "@context": {
-    "dct": "https://purl.org/dc/terms/",
-    "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
-    "edc": "https://w3id.org/edc/v0.0.1/ns/",
-    "dcat": "https://www.w3.org/ns/dcat/",
-    "odrl": "http://www.w3.org/ns/odrl/2/",
-    "dspace": "https://w3id.org/dspace/v0.8/"
-  }
+    "@type": "DataAddress",
+    "endpointType": "https://w3id.org/idsa/v4.1/HTTP",
+    "tx-auth:refreshEndpoint": "http://alice-tractusx-connector-dataplane:8081/api/public/token",
+    "tx-auth:audience": "did:web:dim-static-prod.dis-cloud-prod.cfapps.eu10-004.hana.ondemand.com:dim-hosted:91a44245-d016-4621-add5-61138c3b66e3:holder-iatp",
+    "type": "https://w3id.org/idsa/v4.1/HTTP",
+    "endpoint": "http://alice-tractusx-connector-dataplane:8081/api/public",
+    "tx-auth:refreshToken": "eyJraWQiOiJ0cmFuc2ZlclByb3h5VG9rZW5TaWduZXJQdWJsaWNLZXkiLCJhbGciOiJFZERTQSJ9.eyJleHAiOjE3MTgwOTExNzgsImlhdCI6MTcxODA5MDg3OCwianRpIjoiMTc4YzBjNzgtZWRlMC00ZjQxLTk4MWQtYTk0YjAzZWE3OTY4In0.NM8Y9QsdVgnYE76wOIhAYcORko_Ni7oYNe6adZZG0aZA5EMJlx9B99SFaoIty1ZXBsMUZWYIpuWhTHNvW3bRDg",
+    "tx-auth:expiresIn": "300",
+    "authorization": "eyJraWQiOiJ0cmFuc2ZlclByb3h5VG9rZW5TaWduZXJQdWJsaWNLZXkiLCJhbGciOiJFZERTQSJ9.eyJpc3MiOiJCUE5MMDAwMDAwMDAwMDAxIiwiYXVkIjoiQlBOTDAwMDAwMDAwMDAwMiIsInN1YiI6IkJQTkwwMDAwMDAwMDAwMDEiLCJleHAiOjE3MTgwOTExNzgsImlhdCI6MTcxODA5MDg3OCwianRpIjoiNzQ5MzZjODMtMjhhZS00MmMxLWE2ZTUtOTBkNWI1YWQ0OTE3In0.v3pjqkxvJTwoQinM6I_aZQsV0Xu0ZCFxhWDnDfYOCCqcwMPX3N8T-HLkiEFzqHX1tBgWj8wwHnjSjdA_pz4oCg",
+    "tx-auth:refreshAudience": "did:web:dim-static-prod.dis-cloud-prod.cfapps.eu10-004.hana.ondemand.com:dim-hosted:91a44245-d016-4621-add5-61138c3b66e3:holder-iatp",
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+        "edc": "https://w3id.org/edc/v0.0.1/ns/",
+        "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+        "tx-auth": "https://w3id.org/tractusx/auth/",
+        "cx-policy": "https://w3id.org/catenax/policy/",
+        "odrl": "http://www.w3.org/ns/odrl/2/"
+    }
 }
 ```
 
@@ -221,7 +240,7 @@ For fetching the data we can use two strategies depending on the use case:
 
 #### Provider data-plane
 
-Once the right EDR has been identified using the EDR management API, we can use the `endpont`, `authCode` and `authKey` to make the data request:
+Once the right EDR has been identified using the EDR management API, we can use the `endpoint`, `authCode` and `authKey` to make the data request:
 
 ```shell
 curl --location 'http://localhost/alice/api/public' \

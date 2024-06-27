@@ -202,6 +202,7 @@ curl --location 'http://localhost/bob/management/v2/catalog/request' \
   },
   "@type": "CatalogRequest",
   "counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
+  "counterPartyId": "BPNL000000000001",
   "protocol": "dataspace-protocol-http",
   "querySpec": {
     "offset": 0,
@@ -213,64 +214,115 @@ curl --location 'http://localhost/bob/management/v2/catalog/request' \
 You should be able to find this asset (`id: 30`) in the list of catalog returned by `Alice`.
 ```json
 {
-  "@id": "f6dcc216-9948-4807-8e56-6f867f9226f2",
-  "@type": "dcat:Catalog",
-  "dcat:dataset": [
-    {
-      "@id": "30",
-      "@type": "dcat:Dataset",
-      "odrl:hasPolicy": {
-        "@id": "MzA=:MzA=:OWNhYzMwM2QtOTYyNi00NzY3LTgxZTUtYWVkNDM4NzAwYmNj",
-        "@type": "odrl:Set",
-        "odrl:permission": {
-          "odrl:target": "30",
-          "odrl:action": {
-            "odrl:type": "USE"
-          },
-          "odrl:constraint": {
-            "odrl:or": {
-              "odrl:leftOperand": "https://w3id.org/tractusx/v0.0.1/ns/BusinessPartnerGroup",
-              "odrl:operator": {
-                "@id": "odrl:eq"
-              },
-              "odrl:rightOperand": "gold-partners"
-            }
-          }
-        },
-        "odrl:prohibition": [],
-        "odrl:obligation": [],
-        "odrl:target": {
-          "@id": "30"
-        }
-      },
-      "dcat:distribution": [
+    "@id": "7202b267-42c1-4624-8709-55f21e871807",
+    "@type": "dcat:Catalog",
+    "dspace:participantId": "BPNL000000000001",
+    "dcat:dataset": [
         {
-          "@type": "dcat:Distribution",
-          "dct:format": {
-            "@id": "HttpProxy-PUSH"
-          },
-          "dcat:accessService": "b7c41185-0c2f-42cd-b19d-2ef8e2b6b6a6"
-        },
-        {
-          "@type": "dcat:Distribution",
-          "dct:format": {
-            "@id": "HttpData-PULL"
-          },
-          "dcat:accessService": "b7c41185-0c2f-42cd-b19d-2ef8e2b6b6a6"
+            "@id": "1",
+            "@type": "dcat:Dataset",
+            "odrl:hasPolicy": {
+                "@id": "MQ==:MQ==:NGZiY2IwN2EtN2Q3MS00NmYxLTkwOGYtZjAxZWZkYTk0NTBh",
+                "@type": "odrl:Offer",
+                "odrl:permission": {
+                    "odrl:action": {
+                        "odrl:type": "USE"
+                    },
+                    "odrl:constraint": {
+                        "odrl:or": {
+                            "odrl:leftOperand": "https://w3id.org/tractusx/v0.0.1/ns/BusinessPartnerGroup",
+                            "odrl:operator": {
+                                "@id": "odrl:eq"
+                            },
+                            "odrl:rightOperand": "gold-partners"
+                        }
+                    }
+                },
+                "odrl:prohibition": [],
+                "odrl:obligation": []
+            },
+            "dcat:distribution": [
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "AzureStorage-PUSH"
+                    },
+                    "dcat:accessService": {
+                        "@id": "19f2a493-e093-411d-b85a-a5a881c38fb4",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+                    }
+                },
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "HttpData-PULL"
+                    },
+                    "dcat:accessService": {
+                        "@id": "19f2a493-e093-411d-b85a-a5a881c38fb4",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+                    }
+                },
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "HttpData-PUSH"
+                    },
+                    "dcat:accessService": {
+                        "@id": "19f2a493-e093-411d-b85a-a5a881c38fb4",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+                    }
+                },
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "AmazonS3-PUSH"
+                    },
+                    "dcat:accessService": {
+                        "@id": "19f2a493-e093-411d-b85a-a5a881c38fb4",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+                    }
+                }
+            ],
+            "description": "Product EDC Demo Asset 1",
+            "id": "1"
         }
-      ],
-      "description": "Product EDC Demo Asset",
-      "id": "30"
+    ],
+    "dcat:service": {
+        "@id": "19f2a493-e093-411d-b85a-a5a881c38fb4",
+        "@type": "dcat:DataService",
+        "dcat:endpointDescription": "dspace:connector",
+        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+        "dct:terms": "dspace:connector",
+        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+    },
+    "participantId": "BPNL000000000001",
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+        "edc": "https://w3id.org/edc/v0.0.1/ns/",
+        "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+        "tx-auth": "https://w3id.org/tractusx/auth/",
+        "cx-policy": "https://w3id.org/catenax/policy/",
+        "dcat": "http://www.w3.org/ns/dcat#",
+        "dct": "http://purl.org/dc/terms/",
+        "odrl": "http://www.w3.org/ns/odrl/2/",
+        "dspace": "https://w3id.org/dspace/v0.8/"
     }
-  ],
-  "dcat:service": {
-    "@id": "b7c41185-0c2f-42cd-b19d-2ef8e2b6b6a6",
-    "@type": "dcat:DataService",
-    "dct:terms": "connector",
-    "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
-  },
-  "participantId": "BPNL000000000001",
-  "@context": {}
 }
 ```
 
