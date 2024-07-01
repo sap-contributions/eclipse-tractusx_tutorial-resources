@@ -7,15 +7,58 @@ Following are the steps needed to accomplish this.
 ## 1 Create Keycloak Client
 Presently, Alice and Bob each have a Keycloak client name `alice-private-client` and `bob-private-client`.  
 Trudy should be assigned a Keycloak client as well.
-For simplicity, a client named `trudy-private-client` has already been created.
+For simplicity, a client named `trudy_private_client` has already been created.
+
+If you want to create a client, you can do so in the Keycloak Admin Console and configure roles for that client.
+
+It is complicated to create client with Keycloak APIs, so the client was created with Keycloak Admin Console and exported as [realm file](../keycloak/miw_test_realm.json).
 
 ## 2 Create Wallet in MIW
 A wallet is needed for Trudy associated with its BPN number (`BPNL000000000003`).
 It has been already created along with Alice and Bob's wallet.
 
+Steps to create a wallet with postman:
+- Forward Keycloak and MIW port with the following commands. Use pod names from your setup.
+```shell
+# forward Keycloak port
+kubectl port-forward Keycloak-pod-name 8080:8080
+# forward MIW port
+kubectl port-forward MIW-pod-name 8000:8000
+```
+
+- Create a Keycloak access token:
+```shell
+curl --location 'http://localhost:8080/realms/miw_test/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'client_id=miw_private_client' \
+--data-urlencode 'grant_type=client_credentials' \
+--data-urlencode 'client_secret=miw_private_client' \
+--data-urlencode 'scope=openid'
+```
+
+This will return `access_token`. We need it for creating wallet.
+
+- Create wallet with the following curl command. Replace `access_token` with the one obtained in the previous step.
+```shell
+curl --location 'http://localhost:8000/api/wallets' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <access_token>' \
+--data '{
+    "name": "Trudy-Wallet",
+    "bpn": "BPNL000000000003"
+}'
+```
 ## 3 Create a database for Trudy
 We need a database for Trudy.
 A database named `trudy` has already been created on the existing PostgreSQL server.
+
+Steps to create a database for Trudy:
+1. Forward Postgres port with the following command. Use pod name from your setup.
+```shell
+kubectl port-forward postgres-pod-name 5432:5432
+```
+2. Install PgAdmin and connect to postgres server at `jdbc:postgresql://localhost:5432/` using user `postgres` and password `postgres`.
+3. Create `trudy` database with PgAdmin.
 
 ## 4 Deploy Trudy Connector
 A terraform config has already been defined in [trudy.tfignore](../trudy.tfignore).  
