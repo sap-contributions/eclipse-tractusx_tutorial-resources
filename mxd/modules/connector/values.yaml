@@ -34,8 +34,8 @@ controlplane:
       authKey: password
   image:
     pullPolicy: Never
-    #tag: "latest"
-#    repository: "edc-controlplane-postgresql-hashicorp-vault"
+    tag: "0.6.0"
+    repository: "ciprian2398/edc-controlplane-postgresql-hashicorp-vault"
   securityContext:
     # avoids some errors in the log: cannot write temp files of large multipart requests when R/O
     readOnlyRootFilesystem: false
@@ -52,8 +52,8 @@ dataplane:
     port: 1044
   image:
     pullPolicy: Never
-    #tag: "latest"
-#    repository: "edc-dataplane-hashicorp-vault"
+    tag: "0.6.0"
+    repository: "ciprian2398/edc-dataplane-hashicorp-vault"
   securityContext:
     # avoids some errors in the log: cannot write temp files of large multipart requests when R/O
     readOnlyRootFilesystem: false
