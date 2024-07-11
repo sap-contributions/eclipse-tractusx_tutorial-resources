@@ -189,6 +189,7 @@ curl --location 'http://localhost/bob/management/v2/catalog/request' \
   },
   "@type": "CatalogRequest",
   "counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
+  "counterPartyId": "BPNL000000000001",
   "protocol": "dataspace-protocol-http",
   "querySpec": {
     "offset": 0,
@@ -200,62 +201,118 @@ curl --location 'http://localhost/bob/management/v2/catalog/request' \
 You should be able to find this asset (`id: 20`) in the list of catalog returned by `Alice`.
 ```json
 {
-  "@id": "9c1fc97a-5fcc-49f5-b56a-c78b21ca1f82",
-  "@type": "dcat:Catalog",
-  "dcat:dataset": [
-    {
-      "@id": "20",
-      "@type": "dcat:Dataset",
-      "odrl:hasPolicy": {
-        "@id": "MjA=:MjA=:YWNjNGRkZjctMjZiYS00ZDlmLTkzNDEtNDUyZmViYTlmZjE3",
-        "@type": "odrl:Set",
-        "odrl:permission": {
-          "odrl:target": "20",
-          "odrl:action": {
-            "odrl:type": "USE"
-          },
-          "odrl:constraint": {
-            "odrl:or": {
-              "odrl:leftOperand": "BusinessPartnerNumber",
-              "odrl:operator": {
-                "@id": "odrl:eq"
-              },
-              "odrl:rightOperand": "BPNL000000000002"
-            }
-          }
-        },
-        "odrl:prohibition": [],
-        "odrl:obligation": [],
-        "odrl:target": {
-          "@id": "20"
-        }
-      },
-      "dcat:distribution": [
+    "@id": "ebc5e885-0db6-4a3a-95c5-8f265d2506b0",
+    "@type": "dcat:Catalog",
+    "dspace:participantId": "BPNL000000000001",
+    "dcat:dataset": [
         {
-          "@type": "dcat:Distribution",
-          "dct:format": {
-            "@id": "HttpProxy"
-          },
-          "dcat:accessService": "07d469e1-f1be-459b-a69d-ed16fd1fec3e"
-        },
-        {
-          "@type": "dcat:Distribution",
-          "dct:format": {
-            "@id": "AmazonS3"
-          },
-          "dcat:accessService": "07d469e1-f1be-459b-a69d-ed16fd1fec3e"
+            "@id": "20",
+            "@type": "dcat:Dataset",
+            "odrl:hasPolicy": {
+                "@id": "MjA=:MjA=:MjNlMGZjNDMtNzE2Yy00OWE1LTkxZjctMTQyNDJmMWZlYzE1",
+                "@type": "odrl:Offer",
+                "odrl:permission": {
+                    "odrl:action": {
+                        "odrl:type": "USE"
+                    },
+                    "odrl:constraint": {
+                        "odrl:or": {
+                            "odrl:leftOperand": "BusinessPartnerNumber",
+                            "odrl:operator": {
+                                "@id": "odrl:eq"
+                            },
+                            "odrl:rightOperand": "BPNL000000000002"
+                        }
+                    }
+                },
+                "odrl:prohibition": [],
+                "odrl:obligation": []
+            },
+            "dcat:distribution": [
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "AzureStorage-PUSH"
+                    },
+                    "dcat:accessService": {
+                        "@id": "d79f4cea-1f54-4a24-90b1-5241602f3bfc",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+                    }
+                },
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "HttpData-PULL"
+                    },
+                    "dcat:accessService": {
+                        "@id": "d79f4cea-1f54-4a24-90b1-5241602f3bfc",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+                    }
+                },
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "HttpData-PUSH"
+                    },
+                    "dcat:accessService": {
+                        "@id": "d79f4cea-1f54-4a24-90b1-5241602f3bfc",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+                    }
+                },
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "AmazonS3-PUSH"
+                    },
+                    "dcat:accessService": {
+                        "@id": "d79f4cea-1f54-4a24-90b1-5241602f3bfc",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+                    }
+                }
+            ],
+            "version": "1.0",
+            "name": "alice-test-document",
+            "description": "Product EDC Demo S3 Asset",
+            "id": "20",
+            "contenttype": "text/plain"
         }
-      ],
-      "version": "1.0",
-      "name": "alice-test-document",
-      "description": "Product EDC Demo S3 Asset",
-      "id": "20",
-      "contenttype": "text/plain"
+    ],
+    "dcat:service": {
+        "@id": "d79f4cea-1f54-4a24-90b1-5241602f3bfc",
+        "@type": "dcat:DataService",
+        "dcat:endpointDescription": "dspace:connector",
+        "dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+        "dct:terms": "dspace:connector",
+        "dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+    },
+    "participantId": "BPNL000000000001",
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+        "edc": "https://w3id.org/edc/v0.0.1/ns/",
+        "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+        "tx-auth": "https://w3id.org/tractusx/auth/",
+        "cx-policy": "https://w3id.org/catenax/policy/",
+        "dcat": "http://www.w3.org/ns/dcat#",
+        "dct": "http://purl.org/dc/terms/",
+        "odrl": "http://www.w3.org/ns/odrl/2/",
+        "dspace": "https://w3id.org/dspace/v0.8/"
     }
-  ],
-  "dcat:service": {},
-  "participantId": "BPNL000000000001",
-  "@context": {}
 }
 ```
 > Please take a note of `odrl:hasPolicy#@id` (`MjA=:MjA=:YWNjNGRkZjctMjZiYS00ZDlmLTkzNDEtNDUyZmViYTlmZjE3`)
@@ -268,42 +325,38 @@ curl --location 'http://localhost/bob/management/v2/contractnegotiations' \
 --header 'Content-Type: application/json' \
 --header 'X-Api-Key: password' \
 --data-raw '{
-  "@context": {
-    "odrl": "http://www.w3.org/ns/odrl/2/"
-  },
-  "@type": "NegotiationInitiateRequestDto",
-  "connectorAddress": "http://alice-controlplane:8084/api/v1/dsp",
-  "protocol": "dataspace-protocol-http",
-  "connectorId": "BPNL000000000001",
-  "providerId": "BPNL000000000001",
-  "offer": {
-    "offerId": "<Odrl Policy ID From Above Step>",
-    "assetId": "20",
-    "policy": {
-      "@type": "odrl:Set",
-      "odrl:permission": {
-        "odrl:target": "20",
-        "odrl:action": {
-          "odrl:type": "USE"
-        },
-        "odrl:constraint": {
-          "odrl:or": [
-            {
-              "@type": "Constraint",
-              "odrl:leftOperand": "BusinessPartnerNumber",
-              "odrl:operator": {
-                "@id": "odrl:eq"
-              },
-              "odrl:rightOperand": "BPNL000000000002"
-            }
-          ]
-        }
-      },
-      "odrl:prohibition": [],
-      "odrl:obligation": [],
-      "odrl:target": "20"
-    }
-  }
+"@context": {
+		"@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+	},
+	"@type": "https://w3id.org/edc/v0.0.1/ns/ContractRequest",
+	"counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
+	"protocol": "dataspace-protocol-http",
+	"policy": {
+		"@context": "http://www.w3.org/ns/odrl.jsonld",
+		"@type": "odrl:Offer",
+		"@id": "<Offer ID From Above Step>",
+		"assigner": "BPNL000000000001",
+		"permission": [
+			{
+				"odrl:target": "20",
+				"odrl:action": {
+					"odrl:type": "USE"
+				},
+				"odrl:constraint": {
+					"odrl:or": {
+						"odrl:leftOperand": "BusinessPartnerNumber",
+						"odrl:operator": {
+							"@id": "odrl:eq"
+						},
+						"odrl:rightOperand": "BPNL000000000002"
+					}
+				}
+			}
+		],
+		"prohibition": [],
+		"obligation": [],
+		"target": "20"
+	}
 }'
 ```
 
@@ -358,12 +411,13 @@ curl --location 'http://localhost/bob/management/v2/transferprocesses' \
 --header 'X-Api-Key: password' \
 --data-raw '{
   "@context": {
-    "odrl": "http://www.w3.org/ns/odrl/2/"
+     "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
   },
+  "@type": "https://w3id.org/edc/v0.0.1/ns/TransferRequest",
   "assetId": "20",
-  "connectorAddress": "http://alice-controlplane:8084/api/v1/dsp",
+  "counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
   "connectorId": "BPNL000000000001",
-  "contractId": "<Contract Agreement Id from Get Negotiation Response>",
+  "contractId": "<contract agreement id from finalized negotiation>",
   "dataDestination": {
     "type": "AmazonS3",
     "keyName": "alice-test-document.txt",
@@ -373,7 +427,9 @@ curl --location 'http://localhost/bob/management/v2/transferprocesses' \
     "accessKeyId": "bobawsclient",
     "secretAccessKey": "bobawssecret"
   },
-  "protocol": "dataspace-protocol-http"
+  "callbackAddresses": [],
+  "protocol": "dataspace-protocol-http",
+  "transferType": "AmazonS3-PUSH"
 }'
 ```
 

@@ -180,6 +180,7 @@ curl --location 'http://localhost/bob/management/v2/catalog/request' \
   },
   "@type": "CatalogRequest",
   "counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
+  "counterPartyId": "BPNL000000000001",
   "protocol": "dataspace-protocol-http",
   "querySpec": {
     "offset": 0,
@@ -195,61 +196,92 @@ You should be able to find this asset (`id: 10`) in the list of catalog returned
   "@type": "dcat:Catalog",
   "dcat:dataset": [
     {
-      "@id": "10",
-      "@type": "dcat:Dataset",
-      "odrl:hasPolicy": {
-        "@id": "MTQ=:MTQ=:MTg4ZDBmN2EtZjhmNC00NjBjLWFkYjUtMDY4OTU5MDMzYjg5",
-        "@type": "odrl:Set",
-        "odrl:permission": {
-          "odrl:target": "10",
-          "odrl:action": {
-            "odrl:type": "USE"
-          },
-          "odrl:constraint": {
-            "odrl:or": {
-              "odrl:leftOperand": "BusinessPartnerNumber",
-              "odrl:operator": {
-                "@id": "odrl:eq"
-              },
-              "odrl:rightOperand": "BPNL000000000002"
-            }
-          }
-        },
-        "odrl:prohibition": [],
-        "odrl:obligation": [],
-        "odrl:target": {
-          "@id": "10"
-        }
-      },
-      "dcat:distribution": [
-        {
-          "@type": "dcat:Distribution",
-          "dct:format": {
-            "@id": "HttpProxy"
-          },
-          "dcat:accessService": "fb604275-2fc6-4447-9d3e-63707c98a0db"
-        },
-        {
-          "@type": "dcat:Distribution",
-          "dct:format": {
-            "@id": "AmazonS3"
-          },
-          "dcat:accessService": "fb604275-2fc6-4447-9d3e-63707c98a0db"
-        },
-        {
-          "@type": "dcat:Distribution",
-          "dct:format": {
-            "@id": "AzureStorage"
-          },
-          "dcat:accessService": "fb604275-2fc6-4447-9d3e-63707c98a0db"
-        }
-      ],
-      "version": "1.0",
-      "name": "alice-test-document",
-      "description": "Product EDC Demo Azure Asset",
-      "id": "10",
-      "contenttype": "text/plain"
-    }
+		"@id": "10",
+		"@type": "dcat:Dataset",
+		"odrl:hasPolicy": {
+			"@id": "MTA=:MTA=:MGVmYzIwODItYmMxNC00YTZjLWIyZDMtYTIwNmYzOTljMTA5",
+			"@type": "odrl:Offer",
+			"odrl:permission": {
+				"odrl:action": {
+					"odrl:type": "USE"
+				},
+				"odrl:constraint": {
+					"odrl:or": {
+						"odrl:leftOperand": "BusinessPartnerNumber",
+						"odrl:operator": {
+							"@id": "odrl:eq"
+						},
+						"odrl:rightOperand": "BPNL000000000002"
+					}
+				}
+			},
+			"odrl:prohibition": [],
+			"odrl:obligation": []
+		},
+		"dcat:distribution": [
+			{
+				"@type": "dcat:Distribution",
+				"dct:format": {
+					"@id": "AzureStorage-PUSH"
+				},
+				"dcat:accessService": {
+					"@id": "19f2a493-e093-411d-b85a-a5a881c38fb4",
+					"@type": "dcat:DataService",
+					"dcat:endpointDescription": "dspace:connector",
+					"dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+					"dct:terms": "dspace:connector",
+					"dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+				}
+			},
+			{
+				"@type": "dcat:Distribution",
+				"dct:format": {
+					"@id": "HttpData-PULL"
+				},
+				"dcat:accessService": {
+					"@id": "19f2a493-e093-411d-b85a-a5a881c38fb4",
+					"@type": "dcat:DataService",
+					"dcat:endpointDescription": "dspace:connector",
+					"dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+					"dct:terms": "dspace:connector",
+					"dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+				}
+			},
+			{
+				"@type": "dcat:Distribution",
+				"dct:format": {
+					"@id": "HttpData-PUSH"
+				},
+				"dcat:accessService": {
+					"@id": "19f2a493-e093-411d-b85a-a5a881c38fb4",
+					"@type": "dcat:DataService",
+					"dcat:endpointDescription": "dspace:connector",
+					"dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+					"dct:terms": "dspace:connector",
+					"dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+				}
+			},
+			{
+				"@type": "dcat:Distribution",
+				"dct:format": {
+					"@id": "AmazonS3-PUSH"
+				},
+				"dcat:accessService": {
+					"@id": "19f2a493-e093-411d-b85a-a5a881c38fb4",
+					"@type": "dcat:DataService",
+					"dcat:endpointDescription": "dspace:connector",
+					"dcat:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp",
+					"dct:terms": "dspace:connector",
+					"dct:endpointUrl": "http://alice-controlplane:8084/api/v1/dsp"
+				}
+			}
+		],
+		"version": "1.0",
+		"name": "alice-test-document",
+		"description": "Product EDC Demo Azure Asset",
+		"id": "10",
+		"contenttype": "text/plain"
+	}
   ],
   "dcat:service": {},
   "participantId": "BPNL000000000001",
@@ -266,54 +298,55 @@ curl --location 'http://localhost/bob/management/v2/contractnegotiations' \
 --header 'Content-Type: application/json' \
 --header 'X-Api-Key: password' \
 --data-raw '{
-  "@context": {
-    "odrl": "http://www.w3.org/ns/odrl/2/"
-  },
-  "@type": "NegotiationInitiateRequestDto",
-  "connectorAddress": "http://alice-controlplane:8084/api/v1/dsp",
-  "protocol": "dataspace-protocol-http",
-  "connectorId": "BPNL000000000001",
-  "providerId": "BPNL000000000001",
-  "offer": {
-    "offerId": "<Odrl Policy ID From Above Step>",
-    "assetId": "10",
-    "policy": {
-      "@type": "odrl:Set",
-      "odrl:permission": {
-        "odrl:target": "10",
-        "odrl:action": {
-          "odrl:type": "USE"
-        },
-        "odrl:constraint": {
-          "odrl:or": {
-            "odrl:leftOperand": "BusinessPartnerNumber",
-            "odrl:operator": {
-              "@id": "odrl:eq"
-            },
-            "odrl:rightOperand": "BPNL000000000002"
-          }
-        }
-      },
-      "odrl:prohibition": [],
-      "odrl:obligation": [],
-      "odrl:target": "10"
-    }
-  }
+	"@context": {
+		"@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+	},
+	"@type": "https://w3id.org/edc/v0.0.1/ns/ContractRequest",
+	"counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
+	"protocol": "dataspace-protocol-http",
+	"policy": {
+		"@context": "http://www.w3.org/ns/odrl.jsonld",
+		"@type": "odrl:Offer",
+		"@id": "<Offer ID From Above Step>",
+		"assigner": "BPNL000000000001",
+		"permission": [
+			{
+				"odrl:target": "10",
+				"odrl:action": {
+					"odrl:type": "USE"
+				},
+				"odrl:constraint": {
+					"odrl:or": {
+						"odrl:leftOperand": "BusinessPartnerNumber",
+						"odrl:operator": {
+							"@id": "odrl:eq"
+						},
+						"odrl:rightOperand": "BPNL000000000002"
+					}
+				}
+			}
+		],
+		"prohibition": [],
+		"obligation": [],
+		"target": "10"
+	}
 }'
 ```
 
 Above API should return below response.
 ```json
 {
-  "@type": "IdResponse",
-  "@id": "7af8b1ab-84d6-48b5-896c-09dd3a9a2ea1",
-  "createdAt": 1700740699131,
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
-    "edc": "https://w3id.org/edc/v0.0.1/ns/",
-    "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
-    "odrl": "http://www.w3.org/ns/odrl/2/"
-  }
+	"@type": "IdResponse",
+	"@id": "9fd52dec-22be-4968-86e3-9433d1886421",
+	"createdAt": 1717998834089,
+	"@context": {
+		"@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+		"edc": "https://w3id.org/edc/v0.0.1/ns/",
+		"tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+		"tx-auth": "https://w3id.org/tractusx/auth/",
+		"cx-policy": "https://w3id.org/catenax/policy/",
+		"odrl": "http://www.w3.org/ns/odrl/2/"
+	}
 }
 ```
 > Please take note of the negotiation id (`@id` field) in the response.
@@ -328,17 +361,24 @@ curl --location 'http://localhost/bob/management/v2/contractnegotiations/<NEGOTI
 It should return below response.
 ```json
 {
-  "@type": "ContractNegotiation",
-  "@id": "f1bf0879-7cb5-461b-8c73-ea3957cef6aa",
-  "type": "CONSUMER",
-  "protocol": "dataspace-protocol-http",
-  "state": "FINALIZED",
-  "counterPartyId": "BPNL000000000001",
-  "counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
-  "callbackAddresses": [],
-  "createdAt": 1700737605805,
-  "contractAgreementId": "5fee8548-2018-4363-b417-95af486c6200",
-  "@context": {}
+    "@type": "ContractNegotiation",
+    "@id": "07e1911d-2ced-41a0-9898-2903f26259a3",
+    "type": "CONSUMER",
+    "protocol": "dataspace-protocol-http",
+    "state": "FINALIZED",
+    "counterPartyId": "BPNL000000000001",
+    "counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
+    "callbackAddresses": [],
+    "createdAt": 1718000996596,
+    "contractAgreementId": "f898be23-f822-4eb9-9b07-f474a8c73055",
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+        "edc": "https://w3id.org/edc/v0.0.1/ns/",
+        "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+        "tx-auth": "https://w3id.org/tractusx/auth/",
+        "cx-policy": "https://w3id.org/catenax/policy/",
+        "odrl": "http://www.w3.org/ns/odrl/2/"
+    }
 }
 ```
 Please note:
@@ -375,12 +415,13 @@ curl --location 'http://localhost/bob/management/v2/transferprocesses' \
 --header 'X-Api-Key: password' \
 --data-raw '{
   "@context": {
-    "odrl": "http://www.w3.org/ns/odrl/2/"
+     "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
   },
+  "@type": "https://w3id.org/edc/v0.0.1/ns/TransferRequest",
   "assetId": "10",
-  "connectorAddress": "http://alice-controlplane:8084/api/v1/dsp",
+  "counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
   "connectorId": "BPNL000000000001",
-  "contractId": "<Contract Agreement Id from Get Negotiation Response>",
+  "contractId": "<contract agreement Id from finalized negotiation>",
   "dataDestination": {
     "type": "AzureStorage",
     "account": "bobazureaccount",
@@ -388,22 +429,25 @@ curl --location 'http://localhost/bob/management/v2/transferprocesses' \
     "keyName": "bobazureaccount-sas"
   },
   "callbackAddresses": [],
-  "protocol": "dataspace-protocol-http"
+  "protocol": "dataspace-protocol-http",
+  "transferType": "AzureStorage-PUSH"
 }'
 ```
 
 This API should return below response.
 ```json
 {
-  "@type": "IdResponse",
-  "@id": "3c80c7cb-eff1-4538-a05a-6dcfd08f397a",
-  "createdAt": 1700740670220,
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
-    "edc": "https://w3id.org/edc/v0.0.1/ns/",
-    "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
-    "odrl": "http://www.w3.org/ns/odrl/2/"
-  }
+    "@type": "IdResponse",
+    "@id": "f87fb031-7b11-4600-ba69-ef4b47acb6b3",
+    "createdAt": 1718008950988,
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+        "edc": "https://w3id.org/edc/v0.0.1/ns/",
+        "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+        "tx-auth": "https://w3id.org/tractusx/auth/",
+        "cx-policy": "https://w3id.org/catenax/policy/",
+        "odrl": "http://www.w3.org/ns/odrl/2/"
+    }
 }
 ```
 > Please take note of the transfer process id (`@id` field) in the response.
@@ -419,24 +463,31 @@ curl --location 'http://localhost/bob/management/v2/transferprocesses/<TRANSFER_
 It should return below response:
 ```json
 {
-  "@id": "6e81fb62-a6e1-401f-9748-cd5cbf5fa0c5",
-  "@type": "TransferProcess",
-  "correlationId": "6e81fb62-a6e1-401f-9748-cd5cbf5fa0c5",
-  "state": "COMPLETED",
-  "stateTimestamp": 1700738463944,
-  "type": "CONSUMER",
-  "assetId": "14",
-  "contractId": "5fee8548-2018-4363-b417-95af486c6200",
-  "callbackAddresses": [],
-  "dataDestination": {
-    "@type": "DataAddress",
-    "container": "bob-container",
-    "type": "AzureStorage",
-    "account": "bobazureaccount",
-    "keyName": "bobazureaccount-sas"
-  },
-  "connectorId": "BPNL000000000001",
-  "@context": {}
+    "@id": "f87fb031-7b11-4600-ba69-ef4b47acb6b3",
+    "@type": "TransferProcess",
+    "state": "COMPLETED",
+    "stateTimestamp": 1718008959103,
+    "type": "CONSUMER",
+    "callbackAddresses": [],
+    "correlationId": "76e3d60e-4c3e-4e24-a494-3d4380fec88a",
+    "assetId": "10",
+    "contractId": "990379f1-f2ff-4f90-93a0-64056f8c7aba",
+    "transferType": "AzureStorage-PUSH",
+    "dataDestination": {
+        "@type": "DataAddress",
+        "container": "bob-container",
+        "type": "AzureStorage",
+        "account": "bobazureaccount",
+        "keyName": "bobazureaccount-sas"
+    },
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+        "edc": "https://w3id.org/edc/v0.0.1/ns/",
+        "tx": "https://w3id.org/tractusx/v0.0.1/ns/",
+        "tx-auth": "https://w3id.org/tractusx/auth/",
+        "cx-policy": "https://w3id.org/catenax/policy/",
+        "odrl": "http://www.w3.org/ns/odrl/2/"
+    }
 }
 ```
 > Please note, `state` should be `COMPLETED`. If it is `TERMINATED`, it means, transfer has been failed. Please check logs for more details.

@@ -21,12 +21,13 @@ curl --location 'http://localhost/bob/management/v2/transferprocesses' \
 --header 'X-Api-Key: password' \
 --data-raw '{
   "@context": {
-    "odrl": "http://www.w3.org/ns/odrl/2/"
+     "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
   },
-  "assetId": "<Asset Id>",
-  "connectorAddress": "http://alice-controlplane:8084/api/v1/dsp",
+  "@type": "https://w3id.org/edc/v0.0.1/ns/TransferRequest",
+  "assetId": "20",
+  "counterPartyAddress": "http://alice-controlplane:8084/api/v1/dsp",
   "connectorId": "BPNL000000000001",
-  "contractId": "<Contract Agreement Id from Get Negotiation Response>",
+  "contractId": "<contract agreement id from finalized negotiation>",
   "dataDestination": {
     "type": "AzureStorage",
     "account": "bobazureaccount",
@@ -34,7 +35,8 @@ curl --location 'http://localhost/bob/management/v2/transferprocesses' \
     "keyName": "bobazureaccount-sas"
   },
   "callbackAddresses": [],
-  "protocol": "dataspace-protocol-http"
+  "protocol": "dataspace-protocol-http",
+  "transferType": "AmazonS3-PUSH"
 }'
 ```
 
