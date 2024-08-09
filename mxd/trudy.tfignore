@@ -45,4 +45,6 @@ module "trudy-connector" {
     minio-username = "trudyawsclient"
     minio-password = "trudyawssecret"
   }
+  bdrs-directory-url = local.bdrs-directory-url
+  iatp-config        = var.trudy-iatp-config
 }

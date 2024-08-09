@@ -18,7 +18,7 @@
 #
 
 variable "image-pull-policy" {
-  default     = "Always"
+  default     = "IfNotPresent"
   type        = string
   description = "Kubernetes ImagePullPolicy for all images"
 }
@@ -63,6 +63,19 @@ variable "ssi-config" {
   }
 }
 
+variable "iatp-config" {
+  default = {
+    id                 = ""
+    oauth-tokenUrl     = ""
+    oauth-clientid     = ""
+    oauth-clientsecret = ""
+    oauth-secretalias  = ""
+    dim-url            = null
+    cs-base-url        = ""
+    trusted-issuers    = []
+  }
+}
+
 variable "azure-account-name" {
   description = "Azure Account Name for the connector"
 }
@@ -89,4 +102,8 @@ variable "minio-config" {
 variable "ingress-host" {
   description = "Ingress Host"
   default     = "localhost"
+}
+
+variable "bdrs-directory-url" {
+  description = "bdrs server url"
 }

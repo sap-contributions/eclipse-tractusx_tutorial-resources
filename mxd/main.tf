@@ -75,7 +75,9 @@ module "alice-connector" {
     minio-username = "aliceawsclient"
     minio-password = "aliceawssecret"
   }
-  ingress-host = var.alice-ingress-host
+  ingress-host       = var.alice-ingress-host
+  bdrs-directory-url = local.bdrs-directory-url
+  iatp-config        = var.alice-iatp-config
 }
 
 # Second connector
@@ -106,7 +108,9 @@ module "bob-connector" {
     minio-username = "bobawsclient"
     minio-password = "bobawssecret"
   }
-  ingress-host = var.bob-ingress-host
+  ingress-host       = var.bob-ingress-host
+  bdrs-directory-url = local.bdrs-directory-url
+  iatp-config        = var.bob-iatp-config
 }
 
 module "azurite" {

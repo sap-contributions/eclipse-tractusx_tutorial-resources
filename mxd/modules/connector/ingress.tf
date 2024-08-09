@@ -28,7 +28,7 @@ resource "kubernetes_ingress_v1" "mxd-ingress" {
   spec {
     ingress_class_name = "nginx"
     rule {
-      host = var.ingress-host
+#      host = var.ingress-host
       http {
         path {
           path = "/${var.humanReadableName}(/|$)(.*)"

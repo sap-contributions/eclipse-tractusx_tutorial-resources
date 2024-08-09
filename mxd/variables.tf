@@ -105,3 +105,42 @@ variable "trudy-ingress-host" {
 variable "common-postgres-instance" {
   default = true
 }
+
+variable "alice-iatp-config" {
+  default = {
+    id                 = ""
+    oauth-tokenUrl     = ""
+    oauth-clientid     = ""
+    oauth-clientsecret = ""
+    oauth-secretalias  = ""
+    dim-url            = null
+    cs-base-url        = ""
+    trusted-issuers    = []
+  }
+}
+
+variable "bob-iatp-config" {
+  default = {
+    id                 = ""
+    oauth-tokenUrl     = ""
+    oauth-clientid     = ""
+    oauth-clientsecret = ""
+    oauth-secretalias  = ""
+    dim-url            = null
+    cs-base-url        = ""
+    trusted-issuers    = []
+  }
+}
+
+variable "trudy-iatp-config" {
+  default = {
+    id                 = ""
+    oauth-tokenUrl     = ""
+    oauth-clientid     = ""
+    oauth-clientsecret = ""
+    oauth-secretalias  = ""
+    dim-url            = null
+    cs-base-url        = ""
+    trusted-issuers    = []
+  }
+}

@@ -85,6 +85,9 @@ resource "kubernetes_job" "seed_connectors_via_mgmt_api" {
             "--env-var", "ALICE_BPN=${var.alice-bpn}",
             "--env-var", "BOB_BPN=${var.bob-bpn}",
             "--env-var", "TRUDY_BPN=${var.trudy-bpn}",
+            "--env-var", "ALICE_DID=miw%3A${var.miw-api-port}:${var.alice-bpn}",
+            "--env-var", "BOB_DID=miw%3A${var.miw-api-port}:${var.bob-bpn}",
+            "--env-var", "TRUDY_DID=miw%3A${var.miw-api-port}:${var.trudy-bpn}",
             "/opt/collection/${local.newman_collection_name}"
           ]
           volume_mount {
@@ -101,8 +104,8 @@ resource "kubernetes_job" "seed_connectors_via_mgmt_api" {
             "--folder", "SeedBDRS",
             "--env-var", "BDRS_MGMT_URL=${local.bdrs-mgmt-url}",
             "--env-var", "ALICE_DID=did:web:miw%3A${var.miw-api-port}:${var.alice-bpn}",
-            "--env-var", "BOB_DID=did:web:miw:${var.miw-api-port}:${var.bob-bpn}",
-            "--env-var", "TRUDY_DID=did:web:miw:${var.miw-api-port}:${var.trudy-bpn}",
+            "--env-var", "BOB_DID=did:web:miw%3A${var.miw-api-port}:${var.bob-bpn}",
+            "--env-var", "TRUDY_DID=did:web:miw%3A${var.miw-api-port}:${var.trudy-bpn}",
             "--env-var", "ALICE_BPN=${var.alice-bpn}",
             "--env-var", "BOB_BPN=${var.bob-bpn}",
             "--env-var", "TRUDY_BPN=${var.trudy-bpn}",

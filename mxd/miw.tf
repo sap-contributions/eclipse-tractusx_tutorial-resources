@@ -41,7 +41,7 @@ resource "kubernetes_deployment" "miw" {
       spec {
         container {
           name              = "miw"
-          image             = "tractusx/managed-identity-wallet:0.4.0"
+          image             = "tractusx/managed-identity-wallet:develop"
           image_pull_policy = "Always"
 
           port {

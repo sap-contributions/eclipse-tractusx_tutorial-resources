@@ -32,9 +32,12 @@ resource "helm_release" "connector" {
   cleanup_on_fail   = true
   replace           = true
 
-  repository = "https://eclipse-tractusx.github.io/charts/dev"
-  chart      = "tractusx-connector"
-  version    = "0.6.0"
+#  repository = "https://eclipse-tractusx.github.io/charts/dev"
+#  chart      = "tractusx-connector"
+#  version    = "0.7.2"
+##  version    = "0.8.0-rc1"
+#  devel      = true
+  chart = "../../tractusx-edc/charts/tractusx-connector"
 
   values = [
     file("${path.module}/values.yaml"),
@@ -56,6 +59,7 @@ resource "helm_release" "connector" {
               "/bin/vault kv put secret/${var.azure-account-name}-sas content='${local.azure-sas-token}'",
               "/bin/vault kv put secret/transferProxyTokenSignerPrivateKey content='${tls_private_key.transfer_proxy_privatekey.private_key_pem}'",
               "/bin/vault kv put secret/transferProxyTokenSignerPublicKey content='${tls_private_key.transfer_proxy_privatekey.public_key_pem}'",
+              "/bin/vault kv put secret/${var.iatp-config.oauth-secretalias} content='${var.iatp-config.oauth-clientsecret}'",
             ])
           ]
         }
@@ -70,6 +74,9 @@ resource "helm_release" "connector" {
           "EDC_BLOBSTORE_ENDPOINT_TEMPLATE" : local.edc-blobstore-endpoint-template
           "EDC_DATAPLANE_SELECTOR_DEFAULTPLANE_SOURCETYPES" : "HttpData,AmazonS3,AzureStorage"
           "EDC_DATAPLANE_SELECTOR_DEFAULTPLANE_DESTINATIONTYPES" : "HttpProxy,AmazonS3,AzureStorage"
+          "TX_EDC_IAM_IATP_CREDENTIALSERVICE_URL": var.iatp-config.cs-base-url
+          "EDC_JSONLD_HTTP_ENABLED": true
+          "EDC_JSONLD_HTTPS_ENABLED": true
         }
         ssi : {
           miw : {
@@ -84,6 +91,11 @@ resource "helm_release" "connector" {
             }
           }
         }
+        bdrs : {
+          server : {
+            url : var.bdrs-directory-url
+          }
+        }
       }
       dataplane : {
         env : {
@@ -92,6 +104,22 @@ resource "helm_release" "connector" {
         aws : {
           endpointOverride : "http://${local.minio-url}"
         }
+      }
+      iatp : {
+        id : var.iatp-config.id
+        sts : {
+          dim : {
+            url : var.iatp-config.dim-url
+          }
+          oauth : {
+            token_url : var.iatp-config.oauth-tokenUrl
+            client : {
+              id : var.iatp-config.oauth-clientid,
+              secret_alias : var.iatp-config.oauth-secretalias
+            }
+          }
+        }
+        trustedIssuers : var.iatp-config.trusted-issuers
       }
     })
   ]

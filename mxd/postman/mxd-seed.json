@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "456f5db9-6973-4259-a8a9-381408e48c6a",
+		"_postman_id": "2ad6150d-6084-40ab-960b-14615b381a2d",
 		"name": "MXD Management API Seed",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "252261",
-		"_collection_link": "https://winter-rocket-884715.postman.co/workspace/SAP~ff4cf631-05f4-48ab-a1e0-f716cf2efc25/collection/252261-456f5db9-6973-4259-a8a9-381408e48c6a?action=share&source=collection_link&creator=252261"
+		"_collection_link": "https://winter-rocket-884715.postman.co/workspace/SAP~ff4cf631-05f4-48ab-a1e0-f716cf2efc25/collection/252261-2ad6150d-6084-40ab-960b-14615b381a2d?action=share&source=collection_link&creator=252261"
 	},
 	"item": [
 		{
@@ -345,7 +345,8 @@
 									"});\r",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -354,7 +355,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Alice-Wallet\",\n    \"bpn\": \"{{ALICE_BPN}}\"\n}",
+							"raw": "{\n  \"companyName\": \"Alice-Wallet\",\n  \"businessPartnerNumber\": \"{{ALICE_BPN}}\",\n  \"didUrl\": \"{{ALICE_DID}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -386,7 +387,8 @@
 									"});\r",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -395,7 +397,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Bob-Wallet\",\n    \"bpn\": \"{{BOB_BPN}}\"\n}",
+							"raw": "{\n  \"companyName\": \"Bob-Wallet\",\n  \"businessPartnerNumber\": \"{{BOB_BPN}}\",\n  \"didUrl\": \"{{BOB_DID}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -427,7 +429,8 @@
 									"});\r",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -436,7 +439,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Trudy-Wallet\",\n    \"bpn\": \"{{TRUDY_BPN}}\"\n}",
+							"raw": "{\n  \"companyName\": \"Trudy-Wallet\",\n  \"businessPartnerNumber\": \"{{TRUDY_BPN}}\",\n  \"didUrl\": \"{{TRUDY_DID}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
