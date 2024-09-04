@@ -32,12 +32,10 @@ resource "helm_release" "connector" {
   cleanup_on_fail   = true
   replace           = true
 
-#  repository = "https://eclipse-tractusx.github.io/charts/dev"
-#  chart      = "tractusx-connector"
-#  version    = "0.7.2"
-##  version    = "0.8.0-rc1"
-#  devel      = true
-  chart = "../../tractusx-edc/charts/tractusx-connector"
+  repository = "https://eclipse-tractusx.github.io/charts/dev"
+  chart      = "tractusx-connector"
+  version    = "0.8.0-rc2"
+  devel      = true
 
   values = [
     file("${path.module}/values.yaml"),
