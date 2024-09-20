@@ -34,7 +34,7 @@ resource "helm_release" "connector" {
 
   repository = "https://eclipse-tractusx.github.io/charts/dev"
   chart      = "tractusx-connector"
-  version    = "0.7.1"
+  version    = "0.8.0-rc2"
 
   values = [
     file("${path.module}/values.yaml"),
@@ -71,6 +71,9 @@ resource "helm_release" "connector" {
           "EDC_BLOBSTORE_ENDPOINT_TEMPLATE" : local.edc-blobstore-endpoint-template
           "EDC_DATAPLANE_SELECTOR_DEFAULTPLANE_SOURCETYPES" : "HttpData,AmazonS3,AzureStorage"
           "EDC_DATAPLANE_SELECTOR_DEFAULTPLANE_DESTINATIONTYPES" : "HttpProxy,AmazonS3,AzureStorage"
+          "EDC_DATASOURCE_DEFAULT_URL": local.jdbcUrl
+          "EDC_DATASOURCE_DEFAULT_USER": var.database-credentials.user
+          "EDC_DATASOURCE_DEFAULT_PASSWORD": var.database-credentials.password
         }
         ssi : {
           miw : {
@@ -94,6 +97,9 @@ resource "helm_release" "connector" {
       dataplane : {
         env : {
           "EDC_BLOBSTORE_ENDPOINT_TEMPLATE" : local.edc-blobstore-endpoint-template
+          "EDC_DATASOURCE_DEFAULT_URL": local.jdbcUrl
+          "EDC_DATASOURCE_DEFAULT_USER": var.database-credentials.user
+          "EDC_DATASOURCE_DEFAULT_PASSWORD": var.database-credentials.password
         }
         aws : {
           endpointOverride : "http://${local.minio-url}"

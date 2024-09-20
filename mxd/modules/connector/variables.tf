@@ -18,7 +18,7 @@
 #
 
 variable "image-pull-policy" {
-  default     = "Always"
+  default     = "IfNotPresent"
   type        = string
   description = "Kubernetes ImagePullPolicy for all images"
 }
